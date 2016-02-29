@@ -1,6 +1,7 @@
 package com.neucrack.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -13,12 +14,16 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import com.sun.awt.AWTUtilities;
+
 import java.awt.GridLayout;
+
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -29,7 +34,11 @@ public class PandaTVDanmu extends JFrame {
 
 	private JPanel contentPane;
 	static Point origin = new Point();
-	private JTextField textField;
+	private JTextField mRoomID;
+	private JButton mButtonClose;
+	private JButton mButtonConnect ;
+	private JList<String> mMessageList;
+	private boolean mLock=false;
 	/**
 	 * Launch the application.
 	 */
@@ -68,61 +77,110 @@ public class PandaTVDanmu extends JFrame {
 		gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
-		JButton button_1 = new JButton("✘");
-		button_1.addActionListener(new ActionListener() {
+		mButtonClose = new JButton("✘");
+		mButtonClose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-		GridBagConstraints gbc_button_1 = new GridBagConstraints();
-		gbc_button_1.anchor = GridBagConstraints.EAST;
-		gbc_button_1.insets = new Insets(0, 0, 5, 0);
-		gbc_button_1.gridx = 3;
-		gbc_button_1.gridy = 0;
-		panel.add(button_1, gbc_button_1);
+		GridBagConstraints gbc_mButtonClose = new GridBagConstraints();
+		gbc_mButtonClose.anchor = GridBagConstraints.EAST;
+		gbc_mButtonClose.insets = new Insets(0, 0, 5, 0);
+		gbc_mButtonClose.gridx = 3;
+		gbc_mButtonClose.gridy = 0;
+		panel.add(mButtonClose, gbc_mButtonClose);
 		
-		JLabel label = new JLabel("房间");
-		GridBagConstraints gbc_label = new GridBagConstraints();
-		gbc_label.insets = new Insets(0, 0, 0, 5);
-		gbc_label.anchor = GridBagConstraints.EAST;
-		gbc_label.gridx = 0;
-		gbc_label.gridy = 1;
-		panel.add(label, gbc_label);
+		JLabel mRoomLabel = new JLabel("房间");
+		GridBagConstraints gbc_mRoomLabel = new GridBagConstraints();
+		gbc_mRoomLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_mRoomLabel.anchor = GridBagConstraints.EAST;
+		gbc_mRoomLabel.gridx = 0;
+		gbc_mRoomLabel.gridy = 1;
+		panel.add(mRoomLabel, gbc_mRoomLabel);
 		
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 0, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 1;
-		panel.add(textField, gbc_textField);
-		textField.setColumns(10);
+		mRoomID = new JTextField();
+		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
+		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
+		gbc_mRoomID.fill = GridBagConstraints.HORIZONTAL;
+		gbc_mRoomID.gridx = 1;
+		gbc_mRoomID.gridy = 1;
+		panel.add(mRoomID, gbc_mRoomID);
+		mRoomID.setColumns(10);
 		
-		JButton button = new JButton("连接");
-		GridBagConstraints gbc_button = new GridBagConstraints();
-		gbc_button.insets = new Insets(0, 0, 0, 5);
-		gbc_button.gridx = 2;
-		gbc_button.gridy = 1;
-		panel.add(button, gbc_button);
+		mButtonConnect = new JButton("连接");
+		mButtonConnect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		GridBagConstraints gbc_mButtonConnect = new GridBagConstraints();
+		gbc_mButtonConnect.insets = new Insets(0, 0, 0, 5);
+		gbc_mButtonConnect.gridx = 2;
+		gbc_mButtonConnect.gridy = 1;
+		panel.add(mButtonConnect, gbc_mButtonConnect);
 		
-		JButton button_2 = new JButton("锁定");
-		GridBagConstraints gbc_button_2 = new GridBagConstraints();
-		gbc_button_2.anchor = GridBagConstraints.EAST;
-		gbc_button_2.gridx = 3;
-		gbc_button_2.gridy = 1;
-		panel.add(button_2, gbc_button_2);
+		JButton mButtonLock = new JButton("锁定");
+		mButtonLock.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(mLock){
+					mRoomID.setEnabled(true);
+					mButtonClose.setEnabled(true);
+					mButtonConnect.setEnabled(true);
+					mMessageList.setEnabled(true);
+				}
+				else{
+					mRoomID.setEnabled(false);
+					mButtonClose.setEnabled(false);
+					mButtonConnect.setEnabled(false);
+					mMessageList.setEnabled(false);
+				}
+				mLock=!mLock;
+			}
+		});
+		GridBagConstraints gbc_mButtonLock = new GridBagConstraints();
+		gbc_mButtonLock.anchor = GridBagConstraints.EAST;
+		gbc_mButtonLock.gridx = 3;
+		gbc_mButtonLock.gridy = 1;
+		panel.add(mButtonLock, gbc_mButtonLock);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
-		JList list = new JList();
-		scrollPane.setViewportView(list);
+		mMessageList = new JList<String>();
+		scrollPane.setViewportView(mMessageList);
 		
 		
 		this.setAlwaysOnTop(true);//窗口置顶
+		this.setTitle("PandaTVDanMu");
 		this.setUndecorated(true);
 		AWTUtilities.setWindowOpacity(this, 0.5f);//设置透明度
-
+		
+		mRoomID.setText("313180");//default value of room ID
+		
+		//simulate message data
+		DefaultListModel<String> listModel=new DefaultListModel<String>();
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		listModel.addElement("第一个");
+		mMessageList.setModel(listModel);
+		listModel.addElement("第e个");
+		listModel.addElement("第er个");
+		
 		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
 			// 按下（mousePressed 不是点击，而是鼠标被按下没有抬起）
