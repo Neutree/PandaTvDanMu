@@ -1,6 +1,7 @@
 package com.neucrack.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Point;
@@ -37,8 +38,11 @@ public class PandaTVDanmu extends JFrame {
 	private JTextField mRoomID;
 	private JButton mButtonClose;
 	private JButton mButtonConnect ;
+	private JButton mButtonLock;
 	private JList<String> mMessageList;
 	private boolean mLock=false;
+	DefaultListModel<String> listModel;
+	int mMessagelastIndex=0;
 	/**
 	 * Launch the application.
 	 */
@@ -61,14 +65,17 @@ public class PandaTVDanmu extends JFrame {
 	 * Create the frame.
 	 */
 	public PandaTVDanmu() {
+		setBackground(Color.DARK_GRAY);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1100, 250, 272, 323);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.DARK_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(Color.DARK_GRAY);
 		contentPane.add(panel, BorderLayout.NORTH);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
@@ -91,6 +98,7 @@ public class PandaTVDanmu extends JFrame {
 		panel.add(mButtonClose, gbc_mButtonClose);
 		
 		JLabel mRoomLabel = new JLabel("房间");
+		mRoomLabel.setForeground(Color.WHITE);
 		GridBagConstraints gbc_mRoomLabel = new GridBagConstraints();
 		gbc_mRoomLabel.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomLabel.anchor = GridBagConstraints.EAST;
@@ -99,6 +107,8 @@ public class PandaTVDanmu extends JFrame {
 		panel.add(mRoomLabel, gbc_mRoomLabel);
 		
 		mRoomID = new JTextField();
+		mRoomID.setBackground(Color.DARK_GRAY);
+		mRoomID.setForeground(Color.WHITE);
 		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
 		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomID.fill = GridBagConstraints.HORIZONTAL;
@@ -108,6 +118,8 @@ public class PandaTVDanmu extends JFrame {
 		mRoomID.setColumns(10);
 		
 		mButtonConnect = new JButton("连接");
+		mButtonConnect.setForeground(Color.DARK_GRAY);
+		mButtonConnect.setBackground(Color.WHITE);
 		mButtonConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -119,7 +131,8 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mButtonConnect.gridy = 1;
 		panel.add(mButtonConnect, gbc_mButtonConnect);
 		
-		JButton mButtonLock = new JButton("锁定");
+		mButtonLock = new JButton("锁定");
+		mButtonLock.setForeground(Color.DARK_GRAY);
 		mButtonLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(mLock){
@@ -127,12 +140,14 @@ public class PandaTVDanmu extends JFrame {
 					mButtonClose.setEnabled(true);
 					mButtonConnect.setEnabled(true);
 					mMessageList.setEnabled(true);
+					mButtonLock.setText("锁定");
 				}
 				else{
 					mRoomID.setEnabled(false);
 					mButtonClose.setEnabled(false);
 					mButtonConnect.setEnabled(false);
 					mMessageList.setEnabled(false);
+					mButtonLock.setText("解锁");
 				}
 				mLock=!mLock;
 			}
@@ -147,6 +162,8 @@ public class PandaTVDanmu extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		mMessageList = new JList<String>();
+		mMessageList.setForeground(Color.WHITE);
+		mMessageList.setBackground(Color.DARK_GRAY);
 		scrollPane.setViewportView(mMessageList);
 		
 		
@@ -154,58 +171,47 @@ public class PandaTVDanmu extends JFrame {
 		this.setTitle("PandaTVDanMu");
 		this.setUndecorated(true);
 		AWTUtilities.setWindowOpacity(this, 0.5f);//设置透明度
-		
+		this.validate();
 		mRoomID.setText("313180");//default value of room ID
 		
 		//simulate message data
-		DefaultListModel<String> listModel=new DefaultListModel<String>();
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
-		listModel.addElement("第一个");
+		listModel=new DefaultListModel<String>();
 		mMessageList.setModel(listModel);
-		listModel.addElement("第e个");
-		listModel.addElement("第er个");
-		int lastIndex = mMessageList.getModel().getSize() - 1;
-		if (lastIndex >= 0) {
-			mMessageList.ensureIndexIsVisible(lastIndex);
-		}
+		UpdateDanMu("测试评论。。。");
 		
 		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
 			// 按下（mousePressed 不是点击，而是鼠标被按下没有抬起）
 			public void mousePressed(MouseEvent e) {
 				// 当鼠标按下的时候获得窗口当前的位置
-				origin.x = e.getX();
-				origin.y = e.getY();
+				if(!mLock){
+					origin.x = e.getX();
+					origin.y = e.getY();
+				}
 			}
 		});
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 			// 拖动（mouseDragged 指的不是鼠标在窗口中移动，而是用鼠标拖动）
 			public void mouseDragged(MouseEvent e) {
 				// 当鼠标拖动时获取窗口当前位置
-				Point p =parentPanel.getLocation() ;
-				// 设置窗口的位置
-				// 窗口当前的位置 + 鼠标当前在窗口的位置 - 鼠标按下的时候在窗口的位置
-				parentPanel.setLocation(p.x + e.getX() - origin.x, p.y + e.getY()- origin.y);
+				if(!mLock){
+					Point p =parentPanel.getLocation();
+					// 设置窗口的位置
+					// 窗口当前的位置 + 鼠标当前在窗口的位置 - 鼠标按下的时候在窗口的位置
+					parentPanel.setLocation(p.x + e.getX() - origin.x, p.y + e.getY()- origin.y);
+				}
 			}
 		});
 		
 		
+	}
+	
+	public void UpdateDanMu(String messageContent){
+		listModel.addElement(messageContent);
+		mMessagelastIndex = mMessageList.getModel().getSize() - 1;
+		if (mMessagelastIndex >= 0) {
+			mMessageList.ensureIndexIsVisible(mMessagelastIndex);
+		}
 	}
 
 }
