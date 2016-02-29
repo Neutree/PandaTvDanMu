@@ -180,6 +180,10 @@ public class PandaTVDanmu extends JFrame {
 		mMessageList.setModel(listModel);
 		listModel.addElement("第e个");
 		listModel.addElement("第er个");
+		int lastIndex = mMessageList.getModel().getSize() - 1;
+		if (lastIndex >= 0) {
+			mMessageList.ensureIndexIsVisible(lastIndex);
+		}
 		
 		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
