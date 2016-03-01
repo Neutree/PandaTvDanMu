@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import org.json.JSONArray;
@@ -14,9 +15,12 @@ import com.neucrack.server.HttpRequest;
 
 public class ConnectDanMuServer {
 	
-	final static byte[] STARTFLAG= {0x00,0x06,0x00,0x02};
-	final static byte[] RESPONSE = {0x00,0x06,0x00,0x06};
+	final static byte[] STARTFLAG= {0x00,0x06,0x00,0x02};  //连接弹幕服务器帧头
+	final static byte[] RESPONSE = {0x00,0x06,0x00,0x06};  //连接弹幕服务器响应
+	final static byte[] KEEPALIVE= {0x00,0x06,0x00,0x00};  //与弹幕服务器心跳心跳保持
+	final static byte[] RECEIVEMSG= {0x00,0x06,0x00,0x03}; //接收到消息
 	final static String DANMUSERVERURL="http://www.panda.tv/ajax_chatinfo";
+	final static int IGNOREBYTELENGTH = 16;//弹幕消息体忽略的字节数
 	
 	
 	private int mRid;
@@ -34,6 +38,8 @@ public class ConnectDanMuServer {
 	private Socket socket=null;
 	DataOutputStream os=null;
 	DataInputStream  is=null;
+	private boolean mIsHeartBeatThreadStop=true;
+	private boolean mIsReceivMsgThreadStop=true;
 	
 	public int getmRid() {
 		return mRid;
@@ -184,13 +190,100 @@ public class ConnectDanMuServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(isSuccess)
+		if(isSuccess){
+			//心跳保持
+			HeartBeat heartBeat=new HeartBeat();
+			Thread heartBeatThread=new Thread(heartBeat);//为心跳保持创建新的线程
+			mIsHeartBeatThreadStop=false;
+			heartBeatThread.start();//开始线程
+			//接收弹幕消息
+			ReceiveMessage ReceiveMsg=new ReceiveMessage();
+			Thread receiveMsgThread = new Thread(ReceiveMsg);
+			mIsReceivMsgThreadStop=false;
+			receiveMsgThread.start();
 			return true;
+		}
 		return false;
+	}
+	//实现Runnable的内，用来作为一个新线程与弹幕服务器保持连接（心跳）
+	private class HeartBeat implements Runnable{
+
+		@Override
+		public void run() {
+			while(!mIsHeartBeatThreadStop){
+				try {
+					os.write(KEEPALIVE);
+					System.out.println("保持连接");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					Thread.sleep(300000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	/*
+	 * 用来接收消息的新线程
+	 */
+	private class ReceiveMessage implements Runnable{
+
+		@Override
+		public void run() {
+			byte[] receivMsgFlag=new byte[4];
+			short msgLength;
+			byte[] ignoreBytes=new byte[IGNOREBYTELENGTH];
+			int mssageLength=0;
+			while(!mIsReceivMsgThreadStop){
+				try {
+					if(is.read(receivMsgFlag)>=4){//接收到消息
+						if(receivMsgFlag[0]==RECEIVEMSG[0]&&
+								receivMsgFlag[1]==RECEIVEMSG[1]&&
+								receivMsgFlag[2]==RECEIVEMSG[2]&&
+								receivMsgFlag[3]==RECEIVEMSG[3]){//接收到弹幕消息
+							msgLength = is.readShort();
+							if(msgLength>0){//接收消息体长度
+								byte[] rcvMsg=new byte[msgLength];
+								is.read(rcvMsg);
+								
+								
+								mssageLength=is.readInt();//获取后面消息的长度
+								is.read(ignoreBytes);
+								mssageLength-=IGNOREBYTELENGTH;//剩下的信息长度减去
+								if(mssageLength>0){
+									byte[] msg=new byte[mssageLength];//存放消息体
+									is.read(msg);//读消息体,msg即为弹幕消息体
+								}
+								//解析消息体
+								void MessageDecode(msg);
+							}
+						}
+					}
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+//					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/*
+	 * 解读消息体
+	 */
+	public void MessageDecode(byte[] msg){
+		
 	}
 	public void Close(){
 		if(socket!=null&&os!=null&&is!=null&&socket.isConnected()){
 			try {
+				mIsHeartBeatThreadStop=true;//停止心跳线程
+				mIsReceivMsgThreadStop=true;//停止弹幕消息接收
 				os.close();
 				is.close();
 				socket.close();

@@ -31,6 +31,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Font;
 
 public class PandaTVDanmu extends JFrame {
 
@@ -183,6 +184,7 @@ public class PandaTVDanmu extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		mMessageList = new JList<String>();
+		mMessageList.setFont(new Font("微软雅黑", Font.PLAIN, 13));
 		mMessageList.setForeground(Color.WHITE);
 		mMessageList.setBackground(Color.DARK_GRAY);
 		scrollPane.setViewportView(mMessageList);
