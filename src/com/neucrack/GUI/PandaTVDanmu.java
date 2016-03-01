@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import com.neucrack.protocol.ConnectDanMuServer;
 import com.sun.awt.AWTUtilities;
 
 import java.awt.GridLayout;
@@ -41,8 +42,11 @@ public class PandaTVDanmu extends JFrame {
 	private JButton mButtonLock;
 	private JList<String> mMessageList;
 	private boolean mLock=false;
+	private boolean mIsConnectionAlive=false;
 	DefaultListModel<String> listModel;
 	int mMessagelastIndex=0;
+	private ConnectDanMuServer mDanMuConnection;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -122,7 +126,24 @@ public class PandaTVDanmu extends JFrame {
 		mButtonConnect.setBackground(Color.WHITE);
 		mButtonConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(!mIsConnectionAlive){//未连接
+					mDanMuConnection = new ConnectDanMuServer();
+					if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
+						mIsConnectionAlive=true;
+						mButtonConnect.setText("断开");
+						UpdateDanMu("连接弹幕服务器成功");
+					}
+					else{
+						mIsConnectionAlive=false;
+						UpdateDanMu("连接弹幕服务器失败！！");
+					}
+				}else{//已经连接
+					if(mDanMuConnection!=null)
+						mDanMuConnection.Close();
+					mIsConnectionAlive=false;
+					mButtonConnect.setText("连接");
+					UpdateDanMu("与弹幕服务器断开连接成功");
+				}
 			}
 		});
 		GridBagConstraints gbc_mButtonConnect = new GridBagConstraints();

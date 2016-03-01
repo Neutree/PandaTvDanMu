@@ -17,12 +17,19 @@ import java.util.Arrays;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.neucrack.protocol.ConnectDanMuServer;
 import com.neucrack.server.HttpRequest;
 
 public class Test {
 
 	@org.junit.Test
 	public void test() throws UnknownHostException, IOException {
+		ConnectDanMuServer danMuConnection = new ConnectDanMuServer();
+		if(danMuConnection.ConnectToDanMuServer("313180"))
+			System.out.println("连接弹幕服务器成功");
+		else
+			System.out.println("连接弹幕服务器失败");
+		
 /*		Socket socket = null;
 		socket=new Socket("127.0.0.1",8000);
 		PrintWriter os=new PrintWriter(socket.getOutputStream());
@@ -34,7 +41,7 @@ public class Test {
 		is.close();
 		socket.close();
 	*/	
-		
+/*		
 		String url="http://www.panda.tv/ajax_chatinfo";
 		String param="roomid=11010";
 		String result = HttpRequest.sendGet(url,param);
@@ -100,7 +107,7 @@ public class Test {
 			e.printStackTrace();
 		}
 		
-		
+		*/
 	}
 
 }
