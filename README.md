@@ -3,8 +3,9 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 
 ## 使用方法
 因为是使用的java语言进行编写，可以在不同系统上运行，运行软件需要java虚拟机，所以有如下两种方法<br/>
-###### (1) 针对电脑上已经有java环境的
+###### （1） 针对电脑上已经有java环境的或者是想单独先把java环境装好的
 * <a href="https://github.com/Neutree/PandaTvDanMu/releases" target="_blank">点我</a>找到最新版本，下载jar文件
+* 如果电脑上没装过java环境，请下载安装
 * 运行jar文件，理论上即可。如果不能打开，请搜索“运行jar”
 
 ###### （2）包含运行环境，下载直接双击运行
