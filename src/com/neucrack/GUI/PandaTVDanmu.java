@@ -3,6 +3,7 @@ package com.neucrack.GUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -212,6 +213,8 @@ public class PandaTVDanmu extends JFrame {
 		panelHeader.add(mButtonLock, gbc_mButtonLock);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
+		scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0,0));
 		scrollPane.setOpaque(false);//设置透明
 		scrollPane.getViewport().setOpaque(false);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
