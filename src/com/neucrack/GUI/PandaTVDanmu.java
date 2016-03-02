@@ -14,7 +14,13 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
+import com.neucrack.protocol.Danmu;
+import com.neucrack.protocol.Gift;
+import com.neucrack.protocol.Platform;
+import com.neucrack.protocol.User;
+import com.neucrack.protocol.Visitors;
 import com.sun.awt.AWTUtilities;
 
 import java.awt.GridLayout;
@@ -49,6 +55,7 @@ public class PandaTVDanmu extends JFrame {
 	private ConnectDanMuServer mDanMuConnection;
 	
 	static PandaTVDanmu frame;
+	private JLabel mVisitorNum;
 	
 	/**
 	 * Launch the application.
@@ -97,6 +104,15 @@ public class PandaTVDanmu extends JFrame {
 				System.exit(0);
 			}
 		});
+		
+		mVisitorNum = new JLabel("");
+		mVisitorNum.setBackground(Color.DARK_GRAY);
+		mVisitorNum.setForeground(Color.WHITE);
+		GridBagConstraints gbc_mVisitorNum = new GridBagConstraints();
+		gbc_mVisitorNum.insets = new Insets(0, 0, 5, 5);
+		gbc_mVisitorNum.gridx = 0;
+		gbc_mVisitorNum.gridy = 0;
+		panel.add(mVisitorNum, gbc_mVisitorNum);
 		GridBagConstraints gbc_mButtonClose = new GridBagConstraints();
 		gbc_mButtonClose.anchor = GridBagConstraints.EAST;
 		gbc_mButtonClose.insets = new Insets(0, 0, 5, 0);
@@ -237,6 +253,48 @@ public class PandaTVDanmu extends JFrame {
 		if (mMessagelastIndex >= 0) {
 			mMessageList.ensureIndexIsVisible(mMessagelastIndex);
 		}
+	}
+	
+	//显示数据
+	public void UpdateDanMu(Object message){
+		String msgDis="";
+		/*if(message==null)
+			return;
+		*/
+		if(message.getClass().equals(Danmu.class)){//弹幕
+			Danmu danmu = (Danmu) message;
+			if(danmu.mPlatform.equals(Platform.PLATFORM_Android)||danmu.mPlatform.equals(Platform.PLATFORM_Ios)){
+				msgDis+="☎";
+			}
+			msgDis+=danmu.mNickName;
+			if(Integer.parseInt(danmu.mIdentity)>=60){
+				if(danmu.mIdentity.equals(User.ROLE_MANAGER)){//管理员
+					msgDis+="(管理)";
+				}
+				else if(danmu.mIdentity.equals(User.ROLE_HOSTER)){//主播
+					msgDis+="(主播)";
+				}
+				else if(danmu.mIdentity.equals(User.ROLE_SUPER_MANAGER)){//超管
+					msgDis+="(超管)";
+				}
+			}
+			msgDis+=":";
+			msgDis+=danmu.mContent;
+		}
+		else if(message.getClass().equals(Bamboo.class)){//竹子
+			Bamboo bamboo = (Bamboo) message;
+			msgDis+=bamboo.mNickName+"送给主播"+bamboo.mContent+"个竹子";			
+		}
+		else if(message.getClass().equals(Visitors.class)){//访客数量
+			Visitors visitor = (Visitors) message;
+			mVisitorNum.setText(visitor.mContent);
+			return;
+		}
+		else if(message.getClass().equals(Gift.class)){//礼物
+			Gift gift = (Gift) message;
+			msgDis+=gift.mNickName+"送给主播"+gift.mContentCombo+"个"+gift.mContentName;
+		}
+		UpdateDanMu(msgDis);
 	}
 
 }

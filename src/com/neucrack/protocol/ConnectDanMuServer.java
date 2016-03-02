@@ -281,37 +281,12 @@ public class ConnectDanMuServer {
 	 */
 	public void MessageDecode(byte[] msg){		
 		Message messageHelper=new Message();
-		if(messageHelper.MessageDecode(new String(msg))){//处理消息成功，接下来根据不同的情况推送到用户界面
-			if(messageHelper.getmType().equals(Message.TYPE_DANMU)){//弹幕
-				String messageDis="";
-				if(!messageHelper.getmPlatform().equals(Message.PLATFORM_PC_WEB))
-					messageDis+="☎";
-				messageDis+=messageHelper.getmNickName()+"("+messageHelper.getmLevel()+")";
-				if(Integer.parseInt(messageHelper.getmIdentity())>=60){//是管理员或超管或者房主
-					if(messageHelper.getmIdentity()==Message.ROLE_HOSTER)
-						messageDis+="（主播）";
-					else if(messageHelper.getmIdentity()==Message.ROLE_MANAGER)
-						messageDis+="（管理）";
-					else if(messageHelper.getmIdentity()==Message.ROLE_SUPER_MANAGER)
-						messageDis+="（超管）";
-				}
-				messageDis+="：";
-				messageDis+=messageHelper.getmContent();//评论内容
-				mUIFrame.UpdateDanMu(messageDis);
-			}
-			else if(messageHelper.getmType().equals(Message.TYPE_BAMBOO)){//送的礼物（竹子）
-				System.out.println("aaa");
-				String messageDis=messageHelper.getmNickName()+"送给主播"+messageHelper.getmContent()+"个竹子";
-				mUIFrame.UpdateDanMu(messageDis);
-				
-			}
-			else if(messageHelper.getmType().equals(Message.TYPE_VISITORS)){//访客量
-				
-			}
-			else{
-				System.out.println("未知消息");
-			}
-		}
+		
+		//将这个json格式的字符串进行处理，获得相应类型的对象
+		Object message = messageHelper.MessageDecode(new String(msg));
+		if(message==null)
+			return;
+		mUIFrame.UpdateDanMu(message);
 	}
 	public void Close(){
 		if(socket!=null&&os!=null&&is!=null&&socket.isConnected()){

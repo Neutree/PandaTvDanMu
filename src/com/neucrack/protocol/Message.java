@@ -4,60 +4,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Message {
-	private String mType;//消息种类
-	private long mTime;//时间
-	
-	//房间信息
-	private int mQid;
-	private String mRoomID;
-	
-	//用户（评论者）信息
-	private String mIdentity;//评论者身份
-	private String mRid;     //评论者rid值
-	private String mPlatform;//评论者平台信息
-	private String mNickName;//评论者姓名
-	private String mUserName;//评论者用户名
-	private String mLevel;   //评论者等级
-	
-	//评论内容
-	private String mContent;
-	
-	//枚举
-	//消息类型
-	final static String TYPE_DANMU="1";        //弹幕
-	final static String TYPE_BAMBOO="206";     //礼物（竹子）
-	final static String TYPE_RICE_BALLS="306"; //礼物（饭团）
-	final static String TYPE_GIFT_BROADCAST="311";   //其它房间的礼物（佛跳墙）
-	final static String TYPE_VISITORS="207";   //房间访客量
-	
-	//评论者在房间中的身份
-	final static String ROLE_MANAGER="60";        //管理员
-	final static String ROLE_SUPER_MANAGER="120";  //超管
-	final static String ROLE_HOSTER="90";         //主播
-	//平台
-	final static String PLATFORM_PC_WEB="pc_web";
-	final static String PLATFORM_Android="android";
-	final static String PLATFORM_Ipad="iPad";
-	final static String PLATFORM_Ios="iOS";
-	private class Danmu{
-		public String Code="1";
-	}
-	private class Bamboo{
-		public String Code="206";
-	}
-	private class Visitors{
-		public String Code="207";
-	}
-	private class RiceBalls{
-		public String Code="306";
-	}
-	
-	
-	public Message() {
-		
-	}
-	
-	public boolean MessageDecode(String message){
+//	//枚举
+//	//消息类型
+//	final static String TYPE_DANMU="1";        //弹幕
+//	final static String TYPE_BAMBOO="206";     //礼物（竹子）
+//	final static String TYPE_RICE_BALLS="306"; //礼物（饭团）
+//	final static String TYPE_GIFT_BROADCAST="311";   //其它房间的礼物（佛跳墙）
+//	final static String TYPE_VISITORS="207";   //房间访客量
+
+	public Object MessageDecode(String message){
 		JSONObject json=null;
 		System.out.println(message);
 		try{
@@ -65,184 +20,77 @@ public class Message {
 		}catch(JSONException e){
 			
 		}
-		if(!JsonDecode(json)){
-			return false;
-		}
-		return true;
+		return JsonDecode(json);
 	}
 
-
-
-	public boolean JsonDecode(JSONObject json){
+	public Object JsonDecode(JSONObject json){
+		Object message=null;
+		String type="";
+		long time;
 		try{
-			mType = json.getString("type");
-			mTime = json.getLong("time");
-			mContent = (json.getJSONObject("data")).getString("content");
-			if(!mType.equals(TYPE_DANMU))//礼物没有qid
-					mQid = 0;
-			else
-				mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
-			mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
-			if(mType.equals(TYPE_DANMU))//只有弹幕有身份信息
-				mIdentity = json.getJSONObject("data").getJSONObject("from").getString("identity");
-			else
-				mIdentity = "";
-			mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
-			if(!mType.equals(TYPE_DANMU)){//观众数量、礼物都没有平台信息
-				mPlatform = "";
-			}else
-				mPlatform = json.getJSONObject("data").getJSONObject("from").getString("__plat");
-			if(mType.equals(TYPE_VISITORS)){//房间观众数量没有昵称和用户名以及用户等级
-				mNickName = "";
-				mUserName = "";
-				mLevel = "";
+			type = json.getString("type");
+			time = json.getLong("time");
+			
+			if(type.equals(Danmu.Code)){
+				Danmu danmu=new Danmu();
+				danmu.mTime = time;
+				danmu.mIdentity = json.getJSONObject("data").getJSONObject("from").getString("identity");
+				danmu.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
+				danmu.mPlatform = json.getJSONObject("data").getJSONObject("from").getString("__plat");
+				danmu.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
+				danmu.mLevel = json.getJSONObject("data").getJSONObject("from").getString("level");
+				danmu.mUserName = json.getJSONObject("data").getJSONObject("from").getString("userName");
+				danmu.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				danmu.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
+				danmu.mContent = json.getJSONObject("data").getString("content");
+				message = danmu;
+			}
+			else if(type.equals(Bamboo.Code)){
+				Bamboo bamboo=new Bamboo();
+				bamboo.mTime = time;
+				bamboo.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
+				bamboo.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
+				bamboo.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
+				bamboo.mQid = json.getJSONObject("data").getJSONObject("to").getString("toqid");
+				bamboo.mContent = json.getJSONObject("data").getString("content");
+				message = bamboo;
+			}
+			else if(type.equals(Visitors.Code)){
+				Visitors visitor=new Visitors();
+				visitor.mTime = time;
+				visitor.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
+				visitor.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				visitor.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
+				visitor.mContent = json.getJSONObject("data").getString("content");
+				message = visitor;
+			}
+			else if(type.equals(Gift.Code)){
+				Gift gift=new Gift();
+				gift.mTime = time;
+				gift.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
+				gift.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
+				gift.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				gift.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
+				gift.mContentId = json.getJSONObject("data").getJSONObject("contemt").getString("id");
+				gift.mContentName = json.getJSONObject("data").getJSONObject("contemt").getString("name");
+				gift.mContentPicChatUrl = json.getJSONObject("data").getJSONObject("contemt").getJSONObject("pic").getJSONObject("pc").getString("chat");
+				gift.mContentPicEffectUrl = json.getJSONObject("data").getJSONObject("contemt").getJSONObject("pic").getJSONObject("pc").getString("effect");
+				gift.mContentPrice = json.getJSONObject("data").getJSONObject("contemt").getString("price");
+				gift.mContentEffective = json.getJSONObject("data").getJSONObject("contemt").getString("effective");
+				gift.mContentBamboo = json.getJSONObject("data").getJSONObject("contemt").getString("bamboo");
+				gift.mContentStatus = json.getJSONObject("data").getJSONObject("contemt").getString("status");
+				gift.mContentCount = json.getJSONObject("data").getJSONObject("contemt").getString("count");
+				gift.mContentTotal = json.getJSONObject("data").getJSONObject("contemt").getString("total");
+				gift.mContentCombo = json.getJSONObject("data").getJSONObject("contemt").getString("combo");
+				gift.mContentBamboo = json.getJSONObject("data").getJSONObject("contemt").getString("newBamboos");
+				message = gift;
 			}
 			else{
-				mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
-				if(mType.equals(TYPE_DANMU)){//礼物没有username
-					mUserName = json.getJSONObject("data").getJSONObject("from").getString("userName");
-				}else
-					mUserName ="";
-				mLevel = json.getJSONObject("data").getJSONObject("from").getString("level");
+				System.out.println("未知类型数据");
 			}
 		}catch(JSONException e){
 			System.out.println(e);
 		}
-		return true;
-	}
-
-
-
-	public String getmType() {
-		return mType;
-	}
-
-
-
-	public void setmType(String mType) {
-		this.mType = mType;
-	}
-
-
-
-	public long getmTime() {
-		return mTime;
-	}
-
-
-
-	public void setmTime(long mTime) {
-		this.mTime = mTime;
-	}
-
-
-
-	public int getmQid() {
-		return mQid;
-	}
-
-
-
-	public void setmQid(int mQid) {
-		this.mQid = mQid;
-	}
-
-
-
-	public String getmRoomID() {
-		return mRoomID;
-	}
-
-
-
-	public void setmRoomID(String mRoomID) {
-		this.mRoomID = mRoomID;
-	}
-
-
-
-	public String getmIdentity() {
-		return mIdentity;
-	}
-
-
-
-	public void setmIdentity(String mIdentity) {
-		this.mIdentity = mIdentity;
-	}
-
-
-
-	public String getmRid() {
-		return mRid;
-	}
-
-
-
-	public void setmRid(String mRid) {
-		this.mRid = mRid;
-	}
-
-
-
-	public String getmPlatform() {
-		return mPlatform;
-	}
-
-
-
-	public void setmPlatform(String mPlatform) {
-		this.mPlatform = mPlatform;
-	}
-
-
-
-	public String getmNickName() {
-		return mNickName;
-	}
-
-
-
-	public void setmNickName(String mNickName) {
-		this.mNickName = mNickName;
-	}
-
-
-
-	public String getmUserName() {
-		return mUserName;
-	}
-
-
-
-	public void setmUserName(String mUserName) {
-		this.mUserName = mUserName;
-	}
-
-
-
-	public String getmLevel() {
-		return mLevel;
-	}
-
-
-
-	public void setmLevel(String mLevel) {
-		this.mLevel = mLevel;
-	}
-
-
-
-	public String getmContent() {
-		return mContent;
-	}
-
-
-
-	public void setmContent(String mContent) {
-		this.mContent = mContent;
-	}
-	
-	
-	
+		return message;
+	}	
 }
