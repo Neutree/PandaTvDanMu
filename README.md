@@ -8,4 +8,4 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 * 运行jar文件，理论上即可。如果不能打开，请搜索“运行jar”
 
 ###### （2）包含运行环境，下载直接双击运行
-* <a href="https://github.com/Neutree/PandaTvDanMu/releases" target="_blank">点我</a>找到最新版本，点进去直接下载打包好的zip压缩包（里面包含了java运行环境，无需额外安装java环境），然后解压到一个文件夹下，然后双击<kbd>运行Neucrack熊猫TV弹幕助手.bat</kbd>运行即可。
+* <a href="https://github.com/Neutree/PandaTvDanMu/releases" target="_blank">点我</a>找到最新版本，点进去直接下载打包好的7z压缩包（里面包含了java运行环境，无需额外安装java环境），然后解压到一个文件夹下，然后双击<kbd>运行Neucrack熊猫TV弹幕助手.bat</kbd>运行即可。
