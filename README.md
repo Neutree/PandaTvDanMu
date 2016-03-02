@@ -10,3 +10,12 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 
 ###### （2）包含运行环境，下载直接双击运行
 * <a href="https://github.com/Neutree/PandaTvDanMu/releases" target="_blank">点我</a>找到最新版本，点进去直接下载打包好的7z压缩包（里面包含了java运行环境，无需额外安装java环境），然后解压到一个文件夹下，然后双击<kbd>运行Neucrack熊猫TV弹幕助手.bat</kbd>运行即可。
+###### 注意：
+* 下载文件别下错了哦！在这里<br/>
+![](./doc/asset/release.png)<br/>
+需要点击对应版本的标题，进去之后下载<br/>
+![](./doc/asset/releaseDownload.png)
+
+## 反馈与参与
+* 如果有疑问或者有建议，欢迎添加issu，不会用github（这个网站）的，可以到[这里](http://blog.neucrack.com/index.php/archives/233)评论
+* 可以pull request，哪怕一点改进也会通过滴
