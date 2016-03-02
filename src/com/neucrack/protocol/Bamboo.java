@@ -10,7 +10,7 @@ public class Bamboo {
 	public String mNickName;//评论者姓名
 	
 	//房间信息
-	public String mQid;
+	public int mQid;
 	public String mRoomID;
 		
 	//评论内容

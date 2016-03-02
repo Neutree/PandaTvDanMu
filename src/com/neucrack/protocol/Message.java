@@ -51,7 +51,8 @@ public class Message {
 				bamboo.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
 				bamboo.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
 				bamboo.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
-				bamboo.mQid = json.getJSONObject("data").getJSONObject("to").getString("toqid");
+				//部分弹幕服务器没有这个。。。所以屏蔽掉
+				//bamboo.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
 				bamboo.mContent = json.getJSONObject("data").getString("content");
 				message = bamboo;
 			}
@@ -71,18 +72,18 @@ public class Message {
 				gift.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
 				gift.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
 				gift.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
-				gift.mContentId = json.getJSONObject("data").getJSONObject("contemt").getString("id");
-				gift.mContentName = json.getJSONObject("data").getJSONObject("contemt").getString("name");
-				gift.mContentPicChatUrl = json.getJSONObject("data").getJSONObject("contemt").getJSONObject("pic").getJSONObject("pc").getString("chat");
-				gift.mContentPicEffectUrl = json.getJSONObject("data").getJSONObject("contemt").getJSONObject("pic").getJSONObject("pc").getString("effect");
-				gift.mContentPrice = json.getJSONObject("data").getJSONObject("contemt").getString("price");
-				gift.mContentEffective = json.getJSONObject("data").getJSONObject("contemt").getString("effective");
-				gift.mContentBamboo = json.getJSONObject("data").getJSONObject("contemt").getString("bamboo");
-				gift.mContentStatus = json.getJSONObject("data").getJSONObject("contemt").getString("status");
-				gift.mContentCount = json.getJSONObject("data").getJSONObject("contemt").getString("count");
-				gift.mContentTotal = json.getJSONObject("data").getJSONObject("contemt").getString("total");
-				gift.mContentCombo = json.getJSONObject("data").getJSONObject("contemt").getString("combo");
-				gift.mContentBamboo = json.getJSONObject("data").getJSONObject("contemt").getString("newBamboos");
+				gift.mContentId = json.getJSONObject("data").getJSONObject("content").getString("id");
+				gift.mContentName = json.getJSONObject("data").getJSONObject("content").getString("name");
+				gift.mContentPicChatUrl = json.getJSONObject("data").getJSONObject("content").getJSONObject("pic").getJSONObject("pc").getString("chat");
+				gift.mContentPicEffectUrl = json.getJSONObject("data").getJSONObject("content").getJSONObject("pic").getJSONObject("pc").getString("effect");
+				gift.mContentPrice = json.getJSONObject("data").getJSONObject("content").getString("price");
+				gift.mContentEffective = json.getJSONObject("data").getJSONObject("content").getString("effective");
+				gift.mContentBamboo = json.getJSONObject("data").getJSONObject("content").getString("bamboo");
+				gift.mContentStatus = json.getJSONObject("data").getJSONObject("content").getString("status");
+				gift.mContentCount = json.getJSONObject("data").getJSONObject("content").getString("count");
+				gift.mContentTotal = json.getJSONObject("data").getJSONObject("content").getString("total");
+				gift.mContentCombo = json.getJSONObject("data").getJSONObject("content").getString("combo");
+				gift.mContentNewBamboos = json.getJSONObject("data").getJSONObject("content").getString("newBamboos");
 				message = gift;
 			}
 			else{

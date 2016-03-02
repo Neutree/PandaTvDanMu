@@ -41,8 +41,12 @@ public class HttpRequest {
                 System.out.println(key + "--->" + map.get(key));
             }
             // 定义 BufferedReader输入流来读取URL的响应
+            try{
             in = new BufferedReader(new InputStreamReader(
                     connection.getInputStream()));
+            }catch(IOException e){
+            	return null;
+            }
             String line;
             while ((line = in.readLine()) != null) {
                 result += line;

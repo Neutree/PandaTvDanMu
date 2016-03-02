@@ -156,8 +156,16 @@ public class ConnectDanMuServer {
 	
 	public boolean ConnectToDanMuServer(String roomID) {
 		boolean isSuccess=false;
-		String result = HttpRequest.sendGet(DANMUSERVERURL,"roomid="+roomID);//发送http请求，获取基本参数
-		JSONObject json= new JSONObject(result);//构建json对象
+		String result="";
+		JSONObject json;
+		result= HttpRequest.sendGet(DANMUSERVERURL,"roomid="+roomID);//发送http请求，获取基本参数
+		if(result==null)
+			return false;
+		try{
+			 json= new JSONObject(result);//构建json对象
+		}catch(JSONException e){
+			return false;
+		}
 		if(!JsonDecode(json))//将json内容解析到成员变量中
 			return false;
 		//发送连接弹幕服务器请求（通过socket）

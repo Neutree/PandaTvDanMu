@@ -25,5 +25,5 @@ public class Gift {
 	public String mContentCount;
 	public String mContentTotal;
 	public String mContentCombo;         //连续送的礼物个数
-	public String mContentNewBamboo;
+	public String mContentNewBamboos;
 }

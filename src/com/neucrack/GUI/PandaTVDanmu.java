@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
@@ -22,6 +23,7 @@ import com.neucrack.protocol.Platform;
 import com.neucrack.protocol.User;
 import com.neucrack.protocol.Visitors;
 import com.sun.awt.AWTUtilities;
+import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 import java.awt.GridLayout;
 
@@ -38,6 +40,16 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+
+import javax.swing.border.TitledBorder;
+import javax.swing.border.BevelBorder;
+
+import java.awt.Toolkit;
+
+import javax.swing.ImageIcon;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class PandaTVDanmu extends JFrame {
 
@@ -79,24 +91,26 @@ public class PandaTVDanmu extends JFrame {
 	 * Create the frame.
 	 */
 	public PandaTVDanmu() {
-		setBackground(Color.DARK_GRAY);
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./resources/pic/icon.png"));
+		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1100, 250, 272, 323);
+		
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.DARK_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setOpaque(false);
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel = new JPanel();
-		panel.setBackground(Color.DARK_GRAY);
-		contentPane.add(panel, BorderLayout.NORTH);
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_panel.rowHeights = new int[]{0, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-		panel.setLayout(gbl_panel);
+		JPanel panelHeader = new JPanel();
+		panelHeader.setBackground(Color.DARK_GRAY);
+		contentPane.add(panelHeader, BorderLayout.NORTH);
+		GridBagLayout gbl_panelHeader = new GridBagLayout();
+		gbl_panelHeader.columnWidths = new int[]{0, 0, 0, 0, 0};
+		gbl_panelHeader.rowHeights = new int[]{0, 0};
+		gbl_panelHeader.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+		gbl_panelHeader.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panelHeader.setLayout(gbl_panelHeader);
 		
 		mButtonClose = new JButton("✘");
 		mButtonClose.addActionListener(new ActionListener() {
@@ -105,20 +119,21 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
-		mVisitorNum = new JLabel("");
+		mVisitorNum = new JLabel("0");
+		mVisitorNum.setIcon(new ImageIcon("./resources/pic/audience.png"));
 		mVisitorNum.setBackground(Color.DARK_GRAY);
 		mVisitorNum.setForeground(Color.WHITE);
 		GridBagConstraints gbc_mVisitorNum = new GridBagConstraints();
 		gbc_mVisitorNum.insets = new Insets(0, 0, 5, 5);
 		gbc_mVisitorNum.gridx = 0;
 		gbc_mVisitorNum.gridy = 0;
-		panel.add(mVisitorNum, gbc_mVisitorNum);
+		panelHeader.add(mVisitorNum, gbc_mVisitorNum);
 		GridBagConstraints gbc_mButtonClose = new GridBagConstraints();
 		gbc_mButtonClose.anchor = GridBagConstraints.EAST;
 		gbc_mButtonClose.insets = new Insets(0, 0, 5, 0);
 		gbc_mButtonClose.gridx = 3;
 		gbc_mButtonClose.gridy = 0;
-		panel.add(mButtonClose, gbc_mButtonClose);
+		panelHeader.add(mButtonClose, gbc_mButtonClose);
 		
 		JLabel mRoomLabel = new JLabel("房间");
 		mRoomLabel.setForeground(Color.WHITE);
@@ -127,9 +142,19 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mRoomLabel.anchor = GridBagConstraints.EAST;
 		gbc_mRoomLabel.gridx = 0;
 		gbc_mRoomLabel.gridy = 1;
-		panel.add(mRoomLabel, gbc_mRoomLabel);
+		panelHeader.add(mRoomLabel, gbc_mRoomLabel);
 		
 		mRoomID = new JTextField();
+		mRoomID.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_ENTER){
+					if(mIsConnectionAlive)
+						CloseConnection();
+					StartConnection();
+				}
+			}
+		});
 		mRoomID.setBackground(Color.DARK_GRAY);
 		mRoomID.setForeground(Color.WHITE);
 		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
@@ -137,31 +162,19 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mRoomID.fill = GridBagConstraints.HORIZONTAL;
 		gbc_mRoomID.gridx = 1;
 		gbc_mRoomID.gridy = 1;
-		panel.add(mRoomID, gbc_mRoomID);
+		panelHeader.add(mRoomID, gbc_mRoomID);
+		panelHeader.setOpaque(false);//设置透明
 		mRoomID.setColumns(10);
 		
 		mButtonConnect = new JButton("连接");
 		mButtonConnect.setForeground(Color.DARK_GRAY);
-		mButtonConnect.setBackground(Color.WHITE);
+		mButtonConnect.setBackground(new Color(34, 139, 34));
 		mButtonConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!mIsConnectionAlive){//未连接
-					mDanMuConnection = new ConnectDanMuServer(frame);
-					if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
-						mIsConnectionAlive=true;
-						mButtonConnect.setText("断开");
-						UpdateDanMu("连接弹幕服务器成功");
-					}
-					else{
-						mIsConnectionAlive=false;
-						UpdateDanMu("连接弹幕服务器失败！！");
-					}
+					StartConnection();
 				}else{//已经连接
-					if(mDanMuConnection!=null)
-						mDanMuConnection.Close();
-					mIsConnectionAlive=false;
-					mButtonConnect.setText("连接");
-					UpdateDanMu("与弹幕服务器断开连接成功");
+					CloseConnection();
 				}
 			}
 		});
@@ -169,7 +182,7 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mButtonConnect.insets = new Insets(0, 0, 0, 5);
 		gbc_mButtonConnect.gridx = 2;
 		gbc_mButtonConnect.gridy = 1;
-		panel.add(mButtonConnect, gbc_mButtonConnect);
+		panelHeader.add(mButtonConnect, gbc_mButtonConnect);
 		
 		mButtonLock = new JButton("锁定");
 		mButtonLock.setForeground(Color.DARK_GRAY);
@@ -196,12 +209,18 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mButtonLock.anchor = GridBagConstraints.EAST;
 		gbc_mButtonLock.gridx = 3;
 		gbc_mButtonLock.gridy = 1;
-		panel.add(mButtonLock, gbc_mButtonLock);
+		panelHeader.add(mButtonLock, gbc_mButtonLock);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setOpaque(false);//设置透明
+		scrollPane.getViewport().setOpaque(false);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		mMessageList = new JList<String>();
+		mMessageList.setBorder(null);
+		mMessageList.setBackground(new Color(0, 0, 0, 0));
+		mMessageList.setOpaque(false);//设置透明
+		((JLabel)mMessageList.getCellRenderer()).setOpaque(false);//设置jlist条目透明
 		mMessageList.setFont(new Font("微软雅黑", Font.PLAIN, 13));
 		mMessageList.setForeground(Color.WHITE);
 		mMessageList.setBackground(Color.DARK_GRAY);
@@ -211,14 +230,14 @@ public class PandaTVDanmu extends JFrame {
 		this.setAlwaysOnTop(true);//窗口置顶
 		this.setTitle("PandaTVDanMu");
 		this.setUndecorated(true);
-		AWTUtilities.setWindowOpacity(this, 0.5f);//设置透明度
+		//AWTUtilities.setWindowOpacity(this, 1f);//设置透明度
+		this.setOpacity(1f);
 		this.validate();
 		mRoomID.setText("313180");//default value of room ID
 		
 		//simulate message data
 		listModel=new DefaultListModel<String>();
 		mMessageList.setModel(listModel);
-		UpdateDanMu("测试评论。。。");
 		
 		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
@@ -246,7 +265,27 @@ public class PandaTVDanmu extends JFrame {
 		
 		
 	}
-	
+	private void StartConnection(){
+		mButtonConnect.setText("连接中");
+		mDanMuConnection = new ConnectDanMuServer(frame);
+		if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
+			mIsConnectionAlive=true;
+			mButtonConnect.setText("断开");
+			UpdateDanMu("连接弹幕服务器成功");
+		}
+		else{
+			mIsConnectionAlive=false;
+			mButtonConnect.setText("连接");
+			UpdateDanMu("连接弹幕服务器失败！！");
+		}
+	}
+	private void CloseConnection(){
+		if(mDanMuConnection!=null)
+			mDanMuConnection.Close();
+		mIsConnectionAlive=false;
+		mButtonConnect.setText("连接");
+		UpdateDanMu("与弹幕服务器断开连接成功");
+	}
 	public void UpdateDanMu(String messageContent){
 		listModel.addElement(messageContent);
 		mMessagelastIndex = mMessageList.getModel().getSize() - 1;
@@ -265,6 +304,7 @@ public class PandaTVDanmu extends JFrame {
 			Danmu danmu = (Danmu) message;
 			if(danmu.mPlatform.equals(Platform.PLATFORM_Android)||danmu.mPlatform.equals(Platform.PLATFORM_Ios)){
 				msgDis+="☎";
+				
 			}
 			msgDis+=danmu.mNickName;
 			if(Integer.parseInt(danmu.mIdentity)>=60){
@@ -278,7 +318,7 @@ public class PandaTVDanmu extends JFrame {
 					msgDis+="(超管)";
 				}
 			}
-			msgDis+=":";
+			msgDis+="：";
 			msgDis+=danmu.mContent;
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子
