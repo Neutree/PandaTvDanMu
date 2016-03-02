@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.neucrack.GUI.PandaTVDanmu;
 import com.neucrack.server.HttpRequest;
 
 public class ConnectDanMuServer {
@@ -40,6 +41,8 @@ public class ConnectDanMuServer {
 	DataInputStream  is=null;
 	private boolean mIsHeartBeatThreadStop=true;
 	private boolean mIsReceivMsgThreadStop=true;
+	
+	private PandaTVDanmu mUIFrame=null;
 	
 	public int getmRid() {
 		return mRid;
@@ -97,8 +100,8 @@ public class ConnectDanMuServer {
 	}
 	
 
-	public ConnectDanMuServer() {
-		
+	public ConnectDanMuServer(PandaTVDanmu frame) {
+		mUIFrame=frame;
 	}
 	public ConnectDanMuServer(JSONObject json) {
 		JSONObject jsonData = (JSONObject) json.get("data");
@@ -257,10 +260,10 @@ public class ConnectDanMuServer {
 								mssageLength-=IGNOREBYTELENGTH;//剩下的信息长度减去
 								if(mssageLength>0){
 									byte[] msg=new byte[mssageLength];//存放消息体
-									is.read(msg);//读消息体,msg即为弹幕消息体
+									is.read(msg);//读消息体,msg即为弹幕消息体，格式为json格式
+									//解析消息体
+									MessageDecode(msg);
 								}
-								//解析消息体
-								void MessageDecode(msg);
 							}
 						}
 					}
@@ -276,8 +279,39 @@ public class ConnectDanMuServer {
 	/*
 	 * 解读消息体
 	 */
-	public void MessageDecode(byte[] msg){
-		
+	public void MessageDecode(byte[] msg){		
+		Message messageHelper=new Message();
+		if(messageHelper.MessageDecode(new String(msg))){//处理消息成功，接下来根据不同的情况推送到用户界面
+			if(messageHelper.getmType().equals(Message.TYPE_DANMU)){//弹幕
+				String messageDis="";
+				if(!messageHelper.getmPlatform().equals(Message.PLATFORM_PC_WEB))
+					messageDis+="☎";
+				messageDis+=messageHelper.getmNickName()+"("+messageHelper.getmLevel()+")";
+				if(Integer.parseInt(messageHelper.getmIdentity())>=60){//是管理员或超管或者房主
+					if(messageHelper.getmIdentity()==Message.ROLE_HOSTER)
+						messageDis+="（主播）";
+					else if(messageHelper.getmIdentity()==Message.ROLE_MANAGER)
+						messageDis+="（管理）";
+					else if(messageHelper.getmIdentity()==Message.ROLE_SUPER_MANAGER)
+						messageDis+="（超管）";
+				}
+				messageDis+="：";
+				messageDis+=messageHelper.getmContent();//评论内容
+				mUIFrame.UpdateDanMu(messageDis);
+			}
+			else if(messageHelper.getmType().equals(Message.TYPE_BAMBOO)){//送的礼物（竹子）
+				System.out.println("aaa");
+				String messageDis=messageHelper.getmNickName()+"送给主播"+messageHelper.getmContent()+"个竹子";
+				mUIFrame.UpdateDanMu(messageDis);
+				
+			}
+			else if(messageHelper.getmType().equals(Message.TYPE_VISITORS)){//访客量
+				
+			}
+			else{
+				System.out.println("未知消息");
+			}
+		}
 	}
 	public void Close(){
 		if(socket!=null&&os!=null&&is!=null&&socket.isConnected()){

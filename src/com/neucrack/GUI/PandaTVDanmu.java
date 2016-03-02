@@ -48,6 +48,8 @@ public class PandaTVDanmu extends JFrame {
 	int mMessagelastIndex=0;
 	private ConnectDanMuServer mDanMuConnection;
 	
+	static PandaTVDanmu frame;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -57,7 +59,7 @@ public class PandaTVDanmu extends JFrame {
 				try {
 					String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 					UIManager.setLookAndFeel(lookAndFeel);
-					PandaTVDanmu frame = new PandaTVDanmu();
+					frame = new PandaTVDanmu();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -128,7 +130,7 @@ public class PandaTVDanmu extends JFrame {
 		mButtonConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!mIsConnectionAlive){//未连接
-					mDanMuConnection = new ConnectDanMuServer();
+					mDanMuConnection = new ConnectDanMuServer(frame);
 					if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
 						mIsConnectionAlive=true;
 						mButtonConnect.setText("断开");

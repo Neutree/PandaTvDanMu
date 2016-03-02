@@ -24,12 +24,12 @@ public class Test {
 
 	@org.junit.Test
 	public void test() throws UnknownHostException, IOException {
-		ConnectDanMuServer danMuConnection = new ConnectDanMuServer();
-		if(danMuConnection.ConnectToDanMuServer("313180"))
-			System.out.println("连接弹幕服务器成功");
-		else
-			System.out.println("连接弹幕服务器失败");
-		
+//		ConnectDanMuServer danMuConnection = new ConnectDanMuServer();
+//		if(danMuConnection.ConnectToDanMuServer("313180"))
+//			System.out.println("连接弹幕服务器成功");
+//		else
+//			System.out.println("连接弹幕服务器失败");
+//		
 /*		Socket socket = null;
 		socket=new Socket("127.0.0.1",8000);
 		PrintWriter os=new PrintWriter(socket.getOutputStream());
