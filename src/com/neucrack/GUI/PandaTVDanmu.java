@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -30,6 +31,7 @@ import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 import java.awt.GridLayout;
 
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -72,6 +74,7 @@ public class PandaTVDanmu extends JFrame {
 	final JFrame parentPanel=this;
 	private boolean mLock=false;
 	private boolean mIsConnectionAlive=false;
+	private boolean mIsAutoScroll=true;
 	private DefaultListModel<ListItemDanMu> mListItem;
 	//	DefaultListModel listModel;
 	int mMessagelastIndex=0;
@@ -86,6 +89,8 @@ public class PandaTVDanmu extends JFrame {
 	private JLabel mCloseWindow;
 	private JPanel panel_1_left;
 	private JPanel panel_2_right;
+	private JLabel mStartStopConnection;
+	private JLabel mPauseAutoScroll;
 	
 	/**
 	 * Launch the application.
@@ -192,9 +197,9 @@ public class PandaTVDanmu extends JFrame {
 		gbc_panel_header_2.gridy = 1;
 		panelHeader.add(panel_header_2, gbc_panel_header_2);
 		GridBagLayout gbl_panel_header_2 = new GridBagLayout();
-		gbl_panel_header_2.columnWidths = new int[]{0, 0, 0};
+		gbl_panel_header_2.columnWidths = new int[]{0, 0, 0, 0, 0};
 		gbl_panel_header_2.rowHeights = new int[]{0, 0};
-		gbl_panel_header_2.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_header_2.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		gbl_panel_header_2.rowWeights = new double[]{0.0, Double.MIN_VALUE};
 		panel_header_2.setLayout(gbl_panel_header_2);
 		
@@ -209,6 +214,7 @@ public class PandaTVDanmu extends JFrame {
 		mRoomID = new JTextField();
 		mRoomID.setBorder(new EmptyBorder(0,0,0,0));
 		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
+		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomID.gridx = 1;
 		gbc_mRoomID.gridy = 0;
 		panel_header_2.add(mRoomID, gbc_mRoomID);
@@ -226,6 +232,49 @@ public class PandaTVDanmu extends JFrame {
 		mRoomID.setForeground(Color.WHITE);
 		mRoomID.setColumns(10);
 		mRoomID.setText("313180");
+		
+		mStartStopConnection = new JLabel("");
+		mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+		mStartStopConnection.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(mIsConnectionAlive){
+					CloseConnection();
+					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+					mPauseAutoScroll.setVisible(false);
+				}
+				else{
+					StartConnection();
+					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StopConnection.png"));
+					mPauseAutoScroll.setVisible(true);
+					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+				}
+			}
+		});
+		GridBagConstraints gbc_mStartStopConnection = new GridBagConstraints();
+		gbc_mStartStopConnection.insets = new Insets(0, 0, 0, 5);
+		gbc_mStartStopConnection.gridx = 2;
+		gbc_mStartStopConnection.gridy = 0;
+		panel_header_2.add(mStartStopConnection, gbc_mStartStopConnection);
+		
+		mPauseAutoScroll = new JLabel("");
+		mPauseAutoScroll.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(mIsAutoScroll){//目前是自动滚屏
+					mIsAutoScroll=false;
+					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+				}
+				else{
+					mIsAutoScroll=true;
+					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+				}
+			}
+		});
+		GridBagConstraints gbc_mPauseAutoScroll = new GridBagConstraints();
+		gbc_mPauseAutoScroll.gridx = 3;
+		gbc_mPauseAutoScroll.gridy = 0;
+		panel_header_2.add(mPauseAutoScroll, gbc_mPauseAutoScroll);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
@@ -326,9 +375,11 @@ public class PandaTVDanmu extends JFrame {
 		if(mListItem.getSize()>250){//数据过多，避免占用内存，清理掉
 			mListItem.removeRange(0, mListItem.getSize()-50);
 		}
-		mMessagelastIndex = mMessageList.getModel().getSize() - 1;
-		if (mMessagelastIndex >= 0) {
-			mMessageList.ensureIndexIsVisible(mMessagelastIndex);
+		if(mIsAutoScroll){
+			mMessagelastIndex = mMessageList.getModel().getSize() - 1;
+			if (mMessagelastIndex >= 0) {
+				mMessageList.ensureIndexIsVisible(mMessagelastIndex);
+			}
 		}
 	}
 	
