@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.ListModel;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -51,6 +52,7 @@ import javax.swing.ImageIcon;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 public class PandaTVDanmu extends JFrame {
 
@@ -60,10 +62,11 @@ public class PandaTVDanmu extends JFrame {
 	private JButton mButtonClose;
 	private JButton mButtonConnect ;
 	private JButton mButtonLock;
-	private JList<String> mMessageList;
+	private JList<ListItemDanMu> mMessageList;
 	private boolean mLock=false;
 	private boolean mIsConnectionAlive=false;
-	DefaultListModel<String> listModel;
+	private DefaultListModel<ListItemDanMu> mListItem;
+	//	DefaultListModel listModel;
 	int mMessagelastIndex=0;
 	private ConnectDanMuServer mDanMuConnection;
 	
@@ -137,6 +140,7 @@ public class PandaTVDanmu extends JFrame {
 		panelHeader.add(mButtonClose, gbc_mButtonClose);
 		
 		JLabel mRoomLabel = new JLabel("房间");
+		mRoomLabel.setFont(new Font("微软雅黑 Light", Font.PLAIN, 12));
 		mRoomLabel.setForeground(Color.WHITE);
 		GridBagConstraints gbc_mRoomLabel = new GridBagConstraints();
 		gbc_mRoomLabel.insets = new Insets(0, 0, 0, 5);
@@ -219,14 +223,17 @@ public class PandaTVDanmu extends JFrame {
 		scrollPane.getViewport().setOpaque(false);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
-		mMessageList = new JList<String>();
-		mMessageList.setBorder(null);
-		mMessageList.setBackground(new Color(0, 0, 0, 0));
-		mMessageList.setOpaque(false);//设置透明
-		((JLabel)mMessageList.getCellRenderer()).setOpaque(false);//设置jlist条目透明
-		mMessageList.setFont(new Font("微软雅黑", Font.PLAIN, 13));
-		mMessageList.setForeground(Color.WHITE);
-		mMessageList.setBackground(Color.DARK_GRAY);
+		mListItem = new DefaultListModel<ListItemDanMu>();
+		mListItem.addElement(new ListItemDanMu(true, true, new ImageIcon("./resources/pic/mobile.png"),"哈哈", "", "送给主播", "100", "个", "竹子"));
+		mMessageList = new JList<ListItemDanMu>(mListItem);
+		mMessageList.setCellRenderer(new ListRenderer());
+//		mMessageList.setBorder(null);
+//		mMessageList.setBackground(new Color(0, 0, 0, 0));
+//		mMessageList.setOpaque(false);//设置透明
+//		((JLabel)mMessageList.getCellRenderer()).setOpaque(false);//设置jlist条目透明
+//		mMessageList.setFont(new Font("微软雅黑", Font.PLAIN, 13));
+//		mMessageList.setForeground(Color.WHITE);
+//		mMessageList.setBackground(Color.DARK_GRAY);
 		scrollPane.setViewportView(mMessageList);
 		
 		
@@ -238,9 +245,7 @@ public class PandaTVDanmu extends JFrame {
 		this.validate();
 		mRoomID.setText("313180");//default value of room ID
 		
-		//simulate message data
-		listModel=new DefaultListModel<String>();
-		mMessageList.setModel(listModel);
+		
 		
 		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
@@ -289,44 +294,59 @@ public class PandaTVDanmu extends JFrame {
 		mButtonConnect.setText("连接");
 		UpdateDanMu("与弹幕服务器断开连接成功");
 	}
-	public void UpdateDanMu(String messageContent){
-		listModel.addElement(messageContent);
+	public void UpdateDanMu(ListItemDanMu message){
+		//listModel.addElement(messageContent);
+//		ListItemDanMu element = new ListItemDanMu();
+//		element.mPhone = new ImageIcon("./resources/pic/mobile.png");
+//		element.mMessage = "测试";
+//		element.mName = "测试人名";
+//		listModel.addElement(element);
+//		
+		mListItem.addElement(message);
 		mMessagelastIndex = mMessageList.getModel().getSize() - 1;
 		if (mMessagelastIndex >= 0) {
 			mMessageList.ensureIndexIsVisible(mMessagelastIndex);
 		}
+		
+		
 	}
 	
 	//显示数据
 	public void UpdateDanMu(Object message){
-		String msgDis="";
-		/*if(message==null)
-			return;
-		*/
+		ListItemDanMu danMuMessage=new ListItemDanMu();
 		if(message.getClass().equals(Danmu.class)){//弹幕
 			Danmu danmu = (Danmu) message;
+			danMuMessage.setGift(false);
 			if(danmu.mPlatform.equals(Platform.PLATFORM_Android)||danmu.mPlatform.equals(Platform.PLATFORM_Ios)){
-				msgDis+="☎";
-				
+				danMuMessage.setPhone(true);
+				danMuMessage.setPhoneIcon(new ImageIcon("./resources/pic/mobile.png"));
 			}
-			msgDis+=danmu.mNickName;
+			String userName=danmu.mNickName;
 			if(Integer.parseInt(danmu.mIdentity)>=60){
 				if(danmu.mIdentity.equals(User.ROLE_MANAGER)){//管理员
-					msgDis+="(管理)";
+					userName+="(管理)";
 				}
 				else if(danmu.mIdentity.equals(User.ROLE_HOSTER)){//主播
-					msgDis+="(主播)";
+					userName+="(主播)";
 				}
 				else if(danmu.mIdentity.equals(User.ROLE_SUPER_MANAGER)){//超管
-					msgDis+="(超管)";
+					userName+="(超管)";
 				}
 			}
-			msgDis+="：";
-			msgDis+=danmu.mContent;
+			danMuMessage.setUserName(userName);
+			danMuMessage.setSymbolAfterUserName("：");
+			danMuMessage.setMessage(danmu.mContent);
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子
 			Bamboo bamboo = (Bamboo) message;
-			msgDis+=bamboo.mNickName+"送给主播"+bamboo.mContent+"个竹子";			
+			danMuMessage.setPhone(false);
+			danMuMessage.setGift(true);
+			danMuMessage.setUserName(bamboo.mNickName);
+			danMuMessage.setSymbolAfterUserName("");
+			danMuMessage.setMessage("送给主播");
+			danMuMessage.setGiftNumber(bamboo.mContent);
+			danMuMessage.setGiftUnit("个");
+			danMuMessage.setGiftName("竹子");
 		}
 		else if(message.getClass().equals(Visitors.class)){//访客数量
 			Visitors visitor = (Visitors) message;
@@ -335,9 +355,16 @@ public class PandaTVDanmu extends JFrame {
 		}
 		else if(message.getClass().equals(Gift.class)){//礼物
 			Gift gift = (Gift) message;
-			msgDis+=gift.mNickName+"送给主播"+gift.mContentCombo+"个"+gift.mContentName;
+			danMuMessage.setPhone(false);
+			danMuMessage.setGift(true);
+			danMuMessage.setUserName(gift.mNickName);
+			danMuMessage.setSymbolAfterUserName("");
+			danMuMessage.setMessage("送给主播");
+			danMuMessage.setGiftNumber(gift.mContentCombo);
+			danMuMessage.setGiftUnit("个");
+			danMuMessage.setGiftName(gift.mContentName);
 		}
-		UpdateDanMu(msgDis);
+		UpdateDanMu(danMuMessage);
 	}
 
 }
