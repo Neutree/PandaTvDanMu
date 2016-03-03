@@ -3,9 +3,11 @@ package com.neucrack.GUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -18,6 +20,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
 import com.neucrack.protocol.Danmu;
@@ -32,11 +35,14 @@ import java.awt.GridLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.JTextPane;
 import javax.swing.ListModel;
 
 import java.awt.GridBagLayout;
@@ -91,6 +97,8 @@ public class PandaTVDanmu extends JFrame {
 	private JPanel panel_2_right;
 	private JLabel mStartStopConnection;
 	private JLabel mPauseAutoScroll;
+	private JScrollPane scrollPane;
+	private JLabel mHelp;
 	
 	/**
 	 * Launch the application.
@@ -114,6 +122,23 @@ public class PandaTVDanmu extends JFrame {
 	 * Create the frame.
 	 */
 	public PandaTVDanmu() {
+		addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_CONTROL){
+					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+				}
+
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_CONTROL){
+					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				}
+			}
+		});
 		setIconImage(Toolkit.getDefaultToolkit().getImage("./resources/pic/icon.png"));
 		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -166,9 +191,31 @@ public class PandaTVDanmu extends JFrame {
 		panel_2_right.add(mLockHint);
 		mLockHint.setForeground(Color.WHITE);
 		
+		mHelp = new JLabel("");
+		mHelp.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				JDialog helpDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  帮助", null);
+				helpDialog.setBounds(500, 150, 550, 323);
+				Help helpInfo=new Help();
+				helpDialog.setLayout(new FlowLayout());
+				JTextArea helpMessage = new JTextArea(helpInfo.getmHelpMessage());
+				JTextArea aboutMaker = new JTextArea(helpInfo.getmAboutMaker());
+				helpMessage.setOpaque(false);
+				aboutMaker.setOpaque(false);
+				helpDialog.add(helpMessage);
+				helpDialog.add(aboutMaker);
+				helpDialog.setVisible(true);
+			}
+		});
+		panel_2_right.add(mHelp);
+		mHelp.setIcon(new ImageIcon("./resources/pic/help.png"));
+		mHelp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
 		mCloseWindow = new JLabel("");
 		panel_2_right.add(mCloseWindow);
 		mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+		mCloseWindow.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		mCloseWindow.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -222,9 +269,15 @@ public class PandaTVDanmu extends JFrame {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
-					if(mIsConnectionAlive)
+					if(mIsConnectionAlive){
 						CloseConnection();
+						mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+						mPauseAutoScroll.setVisible(false);
+					}
 					StartConnection();
+					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StopConnection.png"));
+					mPauseAutoScroll.setVisible(true);
+					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
 				}
 			}
 		});
@@ -235,6 +288,7 @@ public class PandaTVDanmu extends JFrame {
 		
 		mStartStopConnection = new JLabel("");
 		mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+		mStartStopConnection.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		mStartStopConnection.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -258,6 +312,7 @@ public class PandaTVDanmu extends JFrame {
 		panel_header_2.add(mStartStopConnection, gbc_mStartStopConnection);
 		
 		mPauseAutoScroll = new JLabel("");
+		mPauseAutoScroll.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		mPauseAutoScroll.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -276,7 +331,7 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mPauseAutoScroll.gridy = 0;
 		panel_header_2.add(mPauseAutoScroll, gbc_mPauseAutoScroll);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
 		scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0,0));
 		scrollPane.setOpaque(false);//设置透明
@@ -285,6 +340,22 @@ public class PandaTVDanmu extends JFrame {
 		
 		mListItem = new DefaultListModel<ListItemDanMu>();
 		mMessageList = new JList<ListItemDanMu>(mListItem);
+		mMessageList.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_CONTROL){
+					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+				}
+			}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_CONTROL){
+					scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+				}
+			}
+		});
 		mMessageList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
