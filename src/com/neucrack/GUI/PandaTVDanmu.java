@@ -20,6 +20,8 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.JIntellitype;
 import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
@@ -99,6 +101,9 @@ public class PandaTVDanmu extends JFrame {
 	private JLabel mPauseAutoScroll;
 	private JScrollPane scrollPane;
 	private JLabel mHelp;
+	
+	//定义热键标识，用于在设置多个热键时，在事件处理中区分用户按下的热键 
+	public static final int FUNC_KEY_MARK = 1;
 	
 	/**
 	 * Launch the application.
@@ -420,7 +425,23 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
-		
+		JIntellitype.getInstance().registerHotKey(FUNC_KEY_MARK,0, KeyEvent.VK_F10);
+		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+			
+			@Override
+			public void onHotKey(int arg0) {
+				switch (arg0) { 
+				case FUNC_KEY_MARK:	
+					if(mLock){
+						UnLock();
+					}
+					else{
+						Lock();
+					}
+					break;
+				}
+			}
+		});
 	}
 	private void StartConnection(){
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接中。。。", null, null, null));
