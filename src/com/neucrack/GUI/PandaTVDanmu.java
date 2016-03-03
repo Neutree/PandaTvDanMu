@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -45,6 +46,7 @@ import java.awt.Font;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.border.BevelBorder;
+import javax.swing.plaf.ListUI;
 
 import java.awt.Toolkit;
 
@@ -53,16 +55,21 @@ import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
+import java.awt.FlowLayout;
+
+import javax.swing.SwingConstants;
+
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class PandaTVDanmu extends JFrame {
 
 	private JPanel contentPane;
 	static Point origin = new Point();
 	private JTextField mRoomID;
-	private JButton mButtonClose;
-	private JButton mButtonConnect ;
-	private JButton mButtonLock;
 	private JList<ListItemDanMu> mMessageList;
+	final JFrame parentPanel=this;
 	private boolean mLock=false;
 	private boolean mIsConnectionAlive=false;
 	private DefaultListModel<ListItemDanMu> mListItem;
@@ -72,6 +79,13 @@ public class PandaTVDanmu extends JFrame {
 	
 	static PandaTVDanmu frame;
 	private JLabel mVisitorNum;
+	private JPanel panel_header_1;
+	private JPanel panel_header_2;
+	private JLabel label;
+	private JLabel mLockHint;
+	private JLabel mCloseWindow;
+	private JPanel panel_1_left;
+	private JPanel panel_2_right;
 	
 	/**
 	 * Launch the application.
@@ -109,47 +123,95 @@ public class PandaTVDanmu extends JFrame {
 		JPanel panelHeader = new JPanel();
 		panelHeader.setBackground(Color.DARK_GRAY);
 		contentPane.add(panelHeader, BorderLayout.NORTH);
+		panelHeader.setOpaque(false);
 		GridBagLayout gbl_panelHeader = new GridBagLayout();
-		gbl_panelHeader.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_panelHeader.rowHeights = new int[]{0, 0};
-		gbl_panelHeader.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_panelHeader.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		gbl_panelHeader.columnWidths = new int[]{0, 0};
+		gbl_panelHeader.rowHeights = new int[]{0, 0, 0, 0, 0};
+		gbl_panelHeader.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_panelHeader.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
 		panelHeader.setLayout(gbl_panelHeader);
 		
-		mButtonClose = new JButton("✘");
-		mButtonClose.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
+		panel_header_1 = new JPanel();
+		panel_header_1.setOpaque(false);
+		GridBagConstraints gbc_panel_header_1 = new GridBagConstraints();
+		gbc_panel_header_1.anchor = GridBagConstraints.EAST;
+		gbc_panel_header_1.insets = new Insets(0, 0, 5, 0);
+		gbc_panel_header_1.fill = GridBagConstraints.VERTICAL;
+		gbc_panel_header_1.gridx = 0;
+		gbc_panel_header_1.gridy = 0;
+		panelHeader.add(panel_header_1, gbc_panel_header_1);
+		panel_header_1.setLayout(new BorderLayout(0, 0));
+		
+		panel_1_left = new JPanel();
+		panel_header_1.add(panel_1_left, BorderLayout.WEST);
+		panel_1_left.setOpaque(false);
 		
 		mVisitorNum = new JLabel("0");
+		panel_1_left.add(mVisitorNum);
+		mVisitorNum.setHorizontalAlignment(SwingConstants.LEFT);
 		mVisitorNum.setIcon(new ImageIcon("./resources/pic/audience.png"));
 		mVisitorNum.setBackground(Color.DARK_GRAY);
 		mVisitorNum.setForeground(Color.WHITE);
-		GridBagConstraints gbc_mVisitorNum = new GridBagConstraints();
-		gbc_mVisitorNum.insets = new Insets(0, 0, 5, 5);
-		gbc_mVisitorNum.gridx = 0;
-		gbc_mVisitorNum.gridy = 0;
-		panelHeader.add(mVisitorNum, gbc_mVisitorNum);
-		GridBagConstraints gbc_mButtonClose = new GridBagConstraints();
-		gbc_mButtonClose.anchor = GridBagConstraints.EAST;
-		gbc_mButtonClose.insets = new Insets(0, 0, 5, 0);
-		gbc_mButtonClose.gridx = 3;
-		gbc_mButtonClose.gridy = 0;
-		panelHeader.add(mButtonClose, gbc_mButtonClose);
 		
-		JLabel mRoomLabel = new JLabel("房间");
-		mRoomLabel.setFont(new Font("微软雅黑 Light", Font.PLAIN, 12));
-		mRoomLabel.setForeground(Color.WHITE);
-		GridBagConstraints gbc_mRoomLabel = new GridBagConstraints();
-		gbc_mRoomLabel.insets = new Insets(0, 0, 0, 5);
-		gbc_mRoomLabel.anchor = GridBagConstraints.EAST;
-		gbc_mRoomLabel.gridx = 0;
-		gbc_mRoomLabel.gridy = 1;
-		panelHeader.add(mRoomLabel, gbc_mRoomLabel);
+		panel_2_right = new JPanel();
+		panel_header_1.add(panel_2_right, BorderLayout.EAST);
+		panel_2_right.setOpaque(false);
+		
+		mLockHint = new JLabel("F10锁定");
+		panel_2_right.add(mLockHint);
+		mLockHint.setForeground(Color.WHITE);
+		
+		mCloseWindow = new JLabel("");
+		panel_2_right.add(mCloseWindow);
+		mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+		mCloseWindow.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				System.exit(0);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_hover.png"));
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_pressed.png"));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+			}
+		});
+		
+		panel_header_2 = new JPanel();
+		panel_header_2.setOpaque(false);
+		GridBagConstraints gbc_panel_header_2 = new GridBagConstraints();
+		gbc_panel_header_2.insets = new Insets(0, 0, 5, 0);
+		gbc_panel_header_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_header_2.gridx = 0;
+		gbc_panel_header_2.gridy = 1;
+		panelHeader.add(panel_header_2, gbc_panel_header_2);
+		GridBagLayout gbl_panel_header_2 = new GridBagLayout();
+		gbl_panel_header_2.columnWidths = new int[]{0, 0, 0};
+		gbl_panel_header_2.rowHeights = new int[]{0, 0};
+		gbl_panel_header_2.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_header_2.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panel_header_2.setLayout(gbl_panel_header_2);
+		
+		label = new JLabel("房间");
+		label.setForeground(Color.WHITE);
+		GridBagConstraints gbc_label = new GridBagConstraints();
+		gbc_label.insets = new Insets(0, 0, 0, 5);
+		gbc_label.gridx = 0;
+		gbc_label.gridy = 0;
+		panel_header_2.add(label, gbc_label);
 		
 		mRoomID = new JTextField();
+		mRoomID.setBorder(new EmptyBorder(0,0,0,0));
+		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
+		gbc_mRoomID.gridx = 1;
+		gbc_mRoomID.gridy = 0;
+		panel_header_2.add(mRoomID, gbc_mRoomID);
 		mRoomID.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -162,59 +224,8 @@ public class PandaTVDanmu extends JFrame {
 		});
 		mRoomID.setBackground(Color.DARK_GRAY);
 		mRoomID.setForeground(Color.WHITE);
-		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
-		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
-		gbc_mRoomID.fill = GridBagConstraints.HORIZONTAL;
-		gbc_mRoomID.gridx = 1;
-		gbc_mRoomID.gridy = 1;
-		panelHeader.add(mRoomID, gbc_mRoomID);
-		panelHeader.setOpaque(false);//设置透明
 		mRoomID.setColumns(10);
-		
-		mButtonConnect = new JButton("连接");
-		mButtonConnect.setForeground(Color.DARK_GRAY);
-		mButtonConnect.setBackground(new Color(34, 139, 34));
-		mButtonConnect.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(!mIsConnectionAlive){//未连接
-					StartConnection();
-				}else{//已经连接
-					CloseConnection();
-				}
-			}
-		});
-		GridBagConstraints gbc_mButtonConnect = new GridBagConstraints();
-		gbc_mButtonConnect.insets = new Insets(0, 0, 0, 5);
-		gbc_mButtonConnect.gridx = 2;
-		gbc_mButtonConnect.gridy = 1;
-		panelHeader.add(mButtonConnect, gbc_mButtonConnect);
-		
-		mButtonLock = new JButton("锁定");
-		mButtonLock.setForeground(Color.DARK_GRAY);
-		mButtonLock.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(mLock){
-					mRoomID.setEnabled(true);
-					mButtonClose.setEnabled(true);
-					mButtonConnect.setEnabled(true);
-					mMessageList.setEnabled(true);
-					mButtonLock.setText("锁定");
-				}
-				else{
-					mRoomID.setEnabled(false);
-					mButtonClose.setEnabled(false);
-					mButtonConnect.setEnabled(false);
-					mMessageList.setEnabled(false);
-					mButtonLock.setText("解锁");
-				}
-				mLock=!mLock;
-			}
-		});
-		GridBagConstraints gbc_mButtonLock = new GridBagConstraints();
-		gbc_mButtonLock.anchor = GridBagConstraints.EAST;
-		gbc_mButtonLock.gridx = 3;
-		gbc_mButtonLock.gridy = 1;
-		panelHeader.add(mButtonLock, gbc_mButtonLock);
+		mRoomID.setText("313180");
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
@@ -224,16 +235,36 @@ public class PandaTVDanmu extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
 		mListItem = new DefaultListModel<ListItemDanMu>();
-		mListItem.addElement(new ListItemDanMu(true, true, new ImageIcon("./resources/pic/mobile.png"),"哈哈", "", "送给主播", "100", "个", "竹子"));
 		mMessageList = new JList<ListItemDanMu>(mListItem);
+		mMessageList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// 当鼠标按下的时候获得窗口当前的位置
+				if(!mLock){
+					origin.x = e.getX();
+					origin.y = e.getY();
+				}
+			}
+		});
+		mMessageList.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				// 当鼠标拖动时获取窗口当前位置
+				if(!mLock){
+					Point p =parentPanel.getLocation();
+					// 设置窗口的位置
+					// 窗口当前的位置 + 鼠标当前在窗口的位置 - 鼠标按下的时候在窗口的位置
+					parentPanel.setLocation(p.x + e.getX() - origin.x, p.y + e.getY()- origin.y);
+				}
+			}
+		});
 		mMessageList.setCellRenderer(new ListRenderer());
-//		mMessageList.setBorder(null);
-//		mMessageList.setBackground(new Color(0, 0, 0, 0));
-//		mMessageList.setOpaque(false);//设置透明
-//		((JLabel)mMessageList.getCellRenderer()).setOpaque(false);//设置jlist条目透明
-//		mMessageList.setFont(new Font("微软雅黑", Font.PLAIN, 13));
-//		mMessageList.setForeground(Color.WHITE);
-//		mMessageList.setBackground(Color.DARK_GRAY);
+		mMessageList.setBorder(null);
+		mMessageList.setBackground(new Color(0, 0, 0, 0));
+		mMessageList.setOpaque(false);//设置透明
+		mMessageList.setBorder(new EmptyBorder(0,0,0,0));
+		
+		//((JLabel)mMessageList.getCellRenderer()).setOpaque(false);//设置jlist条目透明，不是自己构造listrenderer时使用
 		scrollPane.setViewportView(mMessageList);
 		
 		
@@ -241,13 +272,11 @@ public class PandaTVDanmu extends JFrame {
 		this.setTitle("PandaTVDanMu");
 		this.setUndecorated(true);
 		//AWTUtilities.setWindowOpacity(this, 1f);//设置透明度
-		this.setOpacity(1f);
+		this.setOpacity(0.6f);
 		this.validate();
-		mRoomID.setText("313180");//default value of room ID
 		
 		
 		
-		final JFrame parentPanel=this;
 		this.addMouseListener(new MouseAdapter() {
 			// 按下（mousePressed 不是点击，而是鼠标被按下没有抬起）
 			public void mousePressed(MouseEvent e) {
@@ -274,43 +303,45 @@ public class PandaTVDanmu extends JFrame {
 		
 	}
 	private void StartConnection(){
-		mButtonConnect.setText("连接中");
+		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接中。。。", null, null, null));
 		mDanMuConnection = new ConnectDanMuServer(frame);
 		if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
 			mIsConnectionAlive=true;
-			mButtonConnect.setText("断开");
-			UpdateDanMu("连接弹幕服务器成功");
+			UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接弹幕服务器成功", null, null, null));
 		}
 		else{
 			mIsConnectionAlive=false;
-			mButtonConnect.setText("连接");
-			UpdateDanMu("连接弹幕服务器失败！！");
+			UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接弹幕服务器失败！！", null, null, null));
 		}
 	}
 	private void CloseConnection(){
+		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "断开连接中。。。", null, null, null));
 		if(mDanMuConnection!=null)
 			mDanMuConnection.Close();
 		mIsConnectionAlive=false;
-		mButtonConnect.setText("连接");
-		UpdateDanMu("与弹幕服务器断开连接成功");
+		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "与弹幕服务器断开连接成功", null, null, null));
 	}
 	public void UpdateDanMu(ListItemDanMu message){
-		//listModel.addElement(messageContent);
-//		ListItemDanMu element = new ListItemDanMu();
-//		element.mPhone = new ImageIcon("./resources/pic/mobile.png");
-//		element.mMessage = "测试";
-//		element.mName = "测试人名";
-//		listModel.addElement(element);
-//		
 		mListItem.addElement(message);
+		if(mListItem.getSize()>250){//数据过多，避免占用内存，清理掉
+			mListItem.removeRange(0, mListItem.getSize()-50);
+		}
 		mMessagelastIndex = mMessageList.getModel().getSize() - 1;
 		if (mMessagelastIndex >= 0) {
 			mMessageList.ensureIndexIsVisible(mMessagelastIndex);
 		}
-		
-		
 	}
 	
+	public void Lock(){
+		mRoomID.setEnabled(false);
+		mMessageList.setEnabled(false);
+		mLockHint.setText("F10解锁");
+	}
+	public void UnLock(){
+		mRoomID.setEnabled(true);
+		mMessageList.setEnabled(true);
+		mLockHint.setText("F10锁定");
+	}
 	//显示数据
 	public void UpdateDanMu(Object message){
 		ListItemDanMu danMuMessage=new ListItemDanMu();
@@ -334,7 +365,7 @@ public class PandaTVDanmu extends JFrame {
 				}
 			}
 			danMuMessage.setUserName(userName);
-			danMuMessage.setSymbolAfterUserName("：");
+			danMuMessage.setSymbolAfterUserName(":");
 			danMuMessage.setMessage(danmu.mContent);
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子

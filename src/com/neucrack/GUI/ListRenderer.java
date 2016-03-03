@@ -44,13 +44,19 @@ public class ListRenderer extends JPanel implements ListCellRenderer<ListItemDan
 		
 		userName.setForeground(new Color(0x6D40DB));
 		symbolAfterUserName.setForeground(Color.gray);
+		message.setForeground(Color.white);
 		giftNumber.setForeground(new Color(0xFF3C61));
+		giftUnit.setForeground(Color.white);
 		giftName.setForeground(new Color(0x24B073));
 		
 		userName.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
 		symbolAfterUserName.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
+		message.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
 		giftNumber.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
+		giftUnit.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
 		giftName.setFont(new Font("微软雅黑 ", Font.PLAIN, 12));
+		
+		setOpaque(false);
 	}
 	
 	@Override
