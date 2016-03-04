@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JFrame;
@@ -39,6 +40,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -56,6 +58,8 @@ import java.awt.Font;
 
 import javax.swing.border.TitledBorder;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ListUI;
 
 import java.awt.Toolkit;
@@ -84,6 +88,7 @@ public class PandaTVDanmu extends JFrame {
 	private boolean mIsConnectionAlive=false;
 	private boolean mIsAutoScroll=true;
 	private DefaultListModel<ListItemDanMu> mListItem;
+	private int mTransparentValue=0;
 	//	DefaultListModel listModel;
 	int mMessagelastIndex=0;
 	private ConnectDanMuServer mDanMuConnection;
@@ -91,7 +96,7 @@ public class PandaTVDanmu extends JFrame {
 	static PandaTVDanmu frame;
 	private JLabel mVisitorNum;
 	private JPanel panel_header_1;
-	private JPanel panel_header_2;
+	private JPanel panel_header_2_left;
 	private JLabel label;
 	private JLabel mLockHint;
 	private JLabel mCloseWindow;
@@ -104,6 +109,9 @@ public class PandaTVDanmu extends JFrame {
 	
 	//定义热键标识，用于在设置多个热键时，在事件处理中区分用户按下的热键 
 	public static final int FUNC_KEY_MARK = 1;
+	private JPanel panel_header_2;
+	private JPanel panel_header_2_right;
+	private JLabel mSettings;
 	
 	/**
 	 * Launch the application.
@@ -159,22 +167,11 @@ public class PandaTVDanmu extends JFrame {
 		panelHeader.setBackground(Color.DARK_GRAY);
 		contentPane.add(panelHeader, BorderLayout.NORTH);
 		panelHeader.setOpaque(false);
-		GridBagLayout gbl_panelHeader = new GridBagLayout();
-		gbl_panelHeader.columnWidths = new int[]{0, 0};
-		gbl_panelHeader.rowHeights = new int[]{0, 0, 0, 0, 0};
-		gbl_panelHeader.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_panelHeader.rowWeights = new double[]{0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
-		panelHeader.setLayout(gbl_panelHeader);
+		panelHeader.setLayout(new BorderLayout(0, 0));
 		
 		panel_header_1 = new JPanel();
+		panelHeader.add(panel_header_1, BorderLayout.NORTH);
 		panel_header_1.setOpaque(false);
-		GridBagConstraints gbc_panel_header_1 = new GridBagConstraints();
-		gbc_panel_header_1.anchor = GridBagConstraints.EAST;
-		gbc_panel_header_1.insets = new Insets(0, 0, 5, 0);
-		gbc_panel_header_1.fill = GridBagConstraints.VERTICAL;
-		gbc_panel_header_1.gridx = 0;
-		gbc_panel_header_1.gridy = 0;
-		panelHeader.add(panel_header_1, gbc_panel_header_1);
 		panel_header_1.setLayout(new BorderLayout(0, 0));
 		
 		panel_1_left = new JPanel();
@@ -203,16 +200,53 @@ public class PandaTVDanmu extends JFrame {
 				JDialog helpDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  帮助", null);
 				helpDialog.setBounds(500, 150, 550, 323);
 				Help helpInfo=new Help();
-				helpDialog.setLayout(new FlowLayout());
+				helpDialog.getContentPane().setLayout(new FlowLayout());
 				JTextArea helpMessage = new JTextArea(helpInfo.getmHelpMessage());
 				JTextArea aboutMaker = new JTextArea(helpInfo.getmAboutMaker());
 				helpMessage.setOpaque(false);
 				aboutMaker.setOpaque(false);
-				helpDialog.add(helpMessage);
-				helpDialog.add(aboutMaker);
+				helpDialog.getContentPane().add(helpMessage);
+				helpDialog.getContentPane().add(aboutMaker);
 				helpDialog.setVisible(true);
 			}
 		});
+		
+		mSettings = new JLabel("");
+		mSettings.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		mSettings.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				JDialog settingsDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  帮助", null);
+				settingsDialog.setBounds(500, 150, 550, 323);
+				final JLabel  transparentLabel=new JLabel("透明度 0%");
+				final int maxTransparentValue=90;
+				final JSlider slider = new JSlider(0, maxTransparentValue, maxTransparentValue);
+				JButton apply = new JButton("应用");
+				slider.setCursor(new Cursor(Cursor.HAND_CURSOR));
+				settingsDialog.getContentPane().setLayout(new FlowLayout());
+				settingsDialog.getContentPane().add(transparentLabel);
+				settingsDialog.getContentPane().add(slider);
+				settingsDialog.getContentPane().add(apply);
+						
+				settingsDialog.setVisible(true);
+				
+				slider.addChangeListener(new ChangeListener() {
+					@Override
+					public void stateChanged(ChangeEvent e) {
+						mTransparentValue = maxTransparentValue - slider.getValue();
+						transparentLabel.setText("透明度  "+(maxTransparentValue-mTransparentValue)+"% ");
+					}
+				});
+				apply.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						parentPanel.setOpacity((float) ((mTransparentValue+100-maxTransparentValue)/100.0));
+					}
+				}); 
+			}
+		});
+		mSettings.setIcon(new ImageIcon("./resources/pic/settings.png"));
+		panel_2_right.add(mSettings);
 		panel_2_right.add(mHelp);
 		mHelp.setIcon(new ImageIcon("./resources/pic/help.png"));
 		mHelp.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -221,39 +255,21 @@ public class PandaTVDanmu extends JFrame {
 		panel_2_right.add(mCloseWindow);
 		mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
 		mCloseWindow.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		mCloseWindow.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				System.exit(0);
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_hover.png"));
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_pressed.png"));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
-			}
-		});
 		
 		panel_header_2 = new JPanel();
 		panel_header_2.setOpaque(false);
-		GridBagConstraints gbc_panel_header_2 = new GridBagConstraints();
-		gbc_panel_header_2.insets = new Insets(0, 0, 5, 0);
-		gbc_panel_header_2.fill = GridBagConstraints.BOTH;
-		gbc_panel_header_2.gridx = 0;
-		gbc_panel_header_2.gridy = 1;
-		panelHeader.add(panel_header_2, gbc_panel_header_2);
-		GridBagLayout gbl_panel_header_2 = new GridBagLayout();
-		gbl_panel_header_2.columnWidths = new int[]{0, 0, 0, 0, 0};
-		gbl_panel_header_2.rowHeights = new int[]{0, 0};
-		gbl_panel_header_2.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_header_2.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-		panel_header_2.setLayout(gbl_panel_header_2);
+		panelHeader.add(panel_header_2, BorderLayout.SOUTH);
+		panel_header_2.setLayout(new BorderLayout(0, 0));
+		
+		panel_header_2_left = new JPanel();
+		panel_header_2.add(panel_header_2_left, BorderLayout.WEST);
+		panel_header_2_left.setOpaque(false);
+		GridBagLayout gbl_panel_header_2_left = new GridBagLayout();
+		gbl_panel_header_2_left.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_header_2_left.rowHeights = new int[]{0, 0};
+		gbl_panel_header_2_left.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_header_2_left.rowWeights = new double[]{0.0, Double.MIN_VALUE};
+		panel_header_2_left.setLayout(gbl_panel_header_2_left);
 		
 		label = new JLabel("房间");
 		label.setForeground(Color.WHITE);
@@ -261,7 +277,7 @@ public class PandaTVDanmu extends JFrame {
 		gbc_label.insets = new Insets(0, 0, 0, 5);
 		gbc_label.gridx = 0;
 		gbc_label.gridy = 0;
-		panel_header_2.add(label, gbc_label);
+		panel_header_2_left.add(label, gbc_label);
 		
 		mRoomID = new JTextField();
 		mRoomID.setBorder(new EmptyBorder(0,0,0,0));
@@ -269,7 +285,7 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomID.gridx = 1;
 		gbc_mRoomID.gridy = 0;
-		panel_header_2.add(mRoomID, gbc_mRoomID);
+		panel_header_2_left.add(mRoomID, gbc_mRoomID);
 		mRoomID.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -314,7 +330,7 @@ public class PandaTVDanmu extends JFrame {
 		gbc_mStartStopConnection.insets = new Insets(0, 0, 0, 5);
 		gbc_mStartStopConnection.gridx = 2;
 		gbc_mStartStopConnection.gridy = 0;
-		panel_header_2.add(mStartStopConnection, gbc_mStartStopConnection);
+		panel_header_2_left.add(mStartStopConnection, gbc_mStartStopConnection);
 		
 		mPauseAutoScroll = new JLabel("");
 		mPauseAutoScroll.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -332,9 +348,32 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		GridBagConstraints gbc_mPauseAutoScroll = new GridBagConstraints();
+		gbc_mPauseAutoScroll.insets = new Insets(0, 0, 0, 5);
 		gbc_mPauseAutoScroll.gridx = 3;
 		gbc_mPauseAutoScroll.gridy = 0;
-		panel_header_2.add(mPauseAutoScroll, gbc_mPauseAutoScroll);
+		panel_header_2_left.add(mPauseAutoScroll, gbc_mPauseAutoScroll);
+		
+		panel_header_2_right = new JPanel();
+		panel_header_2_right.setOpaque(false);
+		panel_header_2.add(panel_header_2_right, BorderLayout.EAST);
+		mCloseWindow.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				System.exit(0);
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_hover.png"));
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_pressed.png"));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+			}
+		});
 		
 		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
