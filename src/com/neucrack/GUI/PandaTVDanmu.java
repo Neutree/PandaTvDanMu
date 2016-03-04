@@ -434,9 +434,11 @@ public class PandaTVDanmu extends JFrame {
 				case FUNC_KEY_MARK:	
 					if(mLock){
 						UnLock();
+						mLock = false;
 					}
 					else{
 						Lock();
+						mLock=true;
 					}
 					break;
 				}
@@ -478,11 +480,26 @@ public class PandaTVDanmu extends JFrame {
 	public void Lock(){
 		mRoomID.setEnabled(false);
 		mMessageList.setEnabled(false);
+		mStartStopConnection.setVisible(false);
+		mPauseAutoScroll.setVisible(false);
+		mMessageList.setEnabled(false);
+		mHelp.setVisible(false);
+		mCloseWindow.setVisible(false);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mLockHint.setText("F10解锁");
 	}
 	public void UnLock(){
 		mRoomID.setEnabled(true);
 		mMessageList.setEnabled(true);
+		mStartStopConnection.setVisible(true);
+		mPauseAutoScroll.setVisible(true);
+		mMessageList.setEnabled(true);
+		mHelp.setVisible(true);
+		mCloseWindow.setVisible(true);
+		parentPanel.setEnabled(true);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mLockHint.setText("F10锁定");
 	}
 	//显示数据
