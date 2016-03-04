@@ -155,7 +155,7 @@ public class PandaTVDanmu extends JFrame {
 				}
 			}
 		});
-		setIconImage(Toolkit.getDefaultToolkit().getImage("./resources/pic/icon.png"));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(PandaTVDanmu.class.getResource("/pic/icon.png")));
 		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1100, 250, 272, 323);
@@ -184,7 +184,7 @@ public class PandaTVDanmu extends JFrame {
 		mVisitorNum = new JLabel("0");
 		panel_1_left.add(mVisitorNum);
 		mVisitorNum.setHorizontalAlignment(SwingConstants.LEFT);
-		mVisitorNum.setIcon(new ImageIcon("./resources/pic/audience.png"));
+		mVisitorNum.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/audience.png")));
 		mVisitorNum.setBackground(Color.DARK_GRAY);
 		mVisitorNum.setForeground(Color.WHITE);
 		
@@ -219,8 +219,8 @@ public class PandaTVDanmu extends JFrame {
 		mSettings.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				JDialog settingsDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  帮助", null);
-				settingsDialog.setBounds(500, 150, 550, 323);
+				JDialog settingsDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  设置", null);
+				settingsDialog.setBounds(500, 150, 350, 250);
 				settingsDialog.getContentPane().setLayout(new GridLayout(0, 1));
 				JPanel transparentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel rememberRoomIDPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -274,15 +274,15 @@ public class PandaTVDanmu extends JFrame {
 				}); 
 			}
 		});
-		mSettings.setIcon(new ImageIcon("./resources/pic/settings.png"));
+		mSettings.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/settings.png")));
 		panel_2_right.add(mSettings);
 		panel_2_right.add(mHelp);
-		mHelp.setIcon(new ImageIcon("./resources/pic/help.png"));
+		mHelp.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/help.png")));
 		mHelp.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		mCloseWindow = new JLabel("");
 		panel_2_right.add(mCloseWindow);
-		mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+		mCloseWindow.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/close.png")));
 		mCloseWindow.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		panel_header_2 = new JPanel();
@@ -329,13 +329,13 @@ public class PandaTVDanmu extends JFrame {
 				if(e.getKeyCode()==KeyEvent.VK_ENTER){
 					if(mIsConnectionAlive){
 						CloseConnection();
-						mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+						mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 						mPauseAutoScroll.setVisible(false);
 					}
 					StartConnection();
-					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StopConnection.png"));
+					mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StopConnection.png")));
 					mPauseAutoScroll.setVisible(true);
-					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+					mPauseAutoScroll.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StopAutoscroll.png")));
 					PreferenceData prefData = new PreferenceData();
 					if(prefData.IsSaveRoomID())
 						prefData.SaveRoomID(mRoomID.getText());
@@ -350,21 +350,21 @@ public class PandaTVDanmu extends JFrame {
 		
 		
 		mStartStopConnection = new JLabel("");
-		mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+		mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 		mStartStopConnection.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		mStartStopConnection.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(mIsConnectionAlive){
 					CloseConnection();
-					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+					mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 					mPauseAutoScroll.setVisible(false);
 				}
 				else{
 					StartConnection();
-					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StopConnection.png"));
+					mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StopConnection.png")));
 					mPauseAutoScroll.setVisible(true);
-					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+					mPauseAutoScroll.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StopAutoscroll.png")));
 				}
 			}
 		});
@@ -381,11 +381,11 @@ public class PandaTVDanmu extends JFrame {
 			public void mouseReleased(MouseEvent e) {
 				if(mIsAutoScroll){//目前是自动滚屏
 					mIsAutoScroll=false;
-					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
+					mPauseAutoScroll.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 				}
 				else{
 					mIsAutoScroll=true;
-					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+					mPauseAutoScroll.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StopAutoscroll.png")));
 				}
 			}
 		});
@@ -405,15 +405,15 @@ public class PandaTVDanmu extends JFrame {
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_hover.png"));
+				mCloseWindow.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/close_hover.png")));
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close_pressed.png"));
+				mCloseWindow.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/close_pressed.png")));
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				mCloseWindow.setIcon(new ImageIcon("./resources/pic/close.png"));
+				mCloseWindow.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/close.png")));
 			}
 		});
 		
@@ -595,7 +595,7 @@ public class PandaTVDanmu extends JFrame {
 			danMuMessage.setGift(false);
 			if(danmu.mPlatform.equals(Platform.PLATFORM_Android)||danmu.mPlatform.equals(Platform.PLATFORM_Ios)){
 				danMuMessage.setPhone(true);
-				danMuMessage.setPhoneIcon(new ImageIcon("./resources/pic/mobile.png"));
+				danMuMessage.setPhoneIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/mobile.png")));
 			}
 			String userName=danmu.mNickName;
 			if(Integer.parseInt(danmu.mIdentity)>=60){
