@@ -6,13 +6,9 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.JFrame;
@@ -20,12 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
-
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import com.neucrack.DataPersistence.PreferenceData;
-import com.neucrack.GUI.MyFrame.Border;
 import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
@@ -34,13 +27,10 @@ import com.neucrack.protocol.Gift;
 import com.neucrack.protocol.Platform;
 import com.neucrack.protocol.User;
 import com.neucrack.protocol.Visitors;
-import com.sun.awt.AWTUtilities;
-import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 import java.awt.GridLayout;
 
 import javax.swing.DefaultListModel;
-import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -50,22 +40,14 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
-import javax.swing.JTextPane;
-import javax.swing.ListModel;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
 
-import javax.swing.border.TitledBorder;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
-import javax.swing.plaf.ListUI;
 
 import java.awt.Toolkit;
 
@@ -73,15 +55,10 @@ import javax.swing.ImageIcon;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Vector;
-import java.util.prefs.Preferences;
 import java.awt.FlowLayout;
 
 import javax.swing.SwingConstants;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
 
 public class PandaTVDanmu extends JFrame {
 
@@ -690,6 +667,8 @@ public class PandaTVDanmu extends JFrame {
 		
 		@Override
 		public void mouseDragged(MouseEvent e) {
+			if(mLock)
+				return;
 			mIsChangeFrameSize=true;
 			Point dp = e.getLocationOnScreen();
 			// 拖动时的组件原点
@@ -740,6 +719,8 @@ public class PandaTVDanmu extends JFrame {
 
 		@Override
 		public void mouseMoved(MouseEvent arg0) {
+			if(mLock)
+				return;
 			sp = arg0.getLocationOnScreen();
 			cp = arg0.getPoint();
 			width = frame.getWidth();
@@ -792,11 +773,15 @@ public class PandaTVDanmu extends JFrame {
 
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
+			if(mLock)
+				return;
 			mIsChangeFrameSize=true;
 		}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
+			if(mLock)
+				return;
 			mIsChangeFrameSize=false;
 			frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
