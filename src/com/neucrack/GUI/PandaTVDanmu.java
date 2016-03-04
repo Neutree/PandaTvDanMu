@@ -600,17 +600,18 @@ public class PandaTVDanmu extends JFrame {
 			String userName=danmu.mNickName;
 			if(Integer.parseInt(danmu.mIdentity)>=60){
 				if(danmu.mIdentity.equals(User.ROLE_MANAGER)){//管理员
-					userName+="(管理)";
+					danMuMessage.setSymbolAfterUserName("(管理) ");
 				}
 				else if(danmu.mIdentity.equals(User.ROLE_HOSTER)){//主播
-					userName+="(主播)";
+					danMuMessage.setSymbolAfterUserName("(主播) ");
 				}
 				else if(danmu.mIdentity.equals(User.ROLE_SUPER_MANAGER)){//超管
-					userName+="(超管)";
+					danMuMessage.setSymbolAfterUserName("(超管) ");
 				}
 			}
+			else
+				danMuMessage.setSymbolAfterUserName(" ");
 			danMuMessage.setUserName(userName);
-			danMuMessage.setSymbolAfterUserName(":");
 			danMuMessage.setMessage(danmu.mContent);
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子

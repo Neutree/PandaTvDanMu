@@ -3,6 +3,7 @@ package com.neucrack.protocol;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -23,7 +24,7 @@ public class ConnectDanMuServer {
 	final static String DANMUSERVERURL="http://www.panda.tv/ajax_chatinfo";
 	final static int IGNOREBYTELENGTH = 16;//弹幕消息体忽略的字节数
 	
-	
+	static int count=0,count2=0;
 	private int mRid;
 	private int mAppid;
 	private String mTs;
@@ -250,6 +251,7 @@ public class ConnectDanMuServer {
 			short msgLength;
 			byte[] ignoreBytes=new byte[IGNOREBYTELENGTH];
 			int mssageLength=0;
+			
 			while(!mIsReceivMsgThreadStop){
 				try {
 					if(is.read(receivMsgFlag)>=4){//接收到消息
@@ -257,6 +259,8 @@ public class ConnectDanMuServer {
 								receivMsgFlag[1]==RECEIVEMSG[1]&&
 								receivMsgFlag[2]==RECEIVEMSG[2]&&
 								receivMsgFlag[3]==RECEIVEMSG[3]){//接收到弹幕消息
+							
+							//System.out.println("消息"+(count++));
 							msgLength = is.readShort();
 							if(msgLength>0){//接收消息体长度
 								byte[] rcvMsg=new byte[msgLength];
@@ -270,31 +274,56 @@ public class ConnectDanMuServer {
 									byte[] msg=new byte[mssageLength];//存放消息体
 									is.read(msg);//读消息体,msg即为弹幕消息体，格式为json格式
 									//解析消息体
-									MessageDecode(msg);
+									MessageDecode(new String(msg));
 								}
 							}
+						}
+						else{
+							System.out.println(receivMsgFlag[0]+" "+receivMsgFlag[1]+" "+
+									receivMsgFlag[2]+" "+
+									receivMsgFlag[3]+" ");
 						}
 					}
 					
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 //					e.printStackTrace();
+					System.out.println(e);
 				}
 			}
 		}
 	}
 	
+	Message messageHelper=new Message();
+	Object messageReceied;
 	/*
-	 * 解读消息体
+	 * 解读消息体，注意！！在弹幕多的情况下，一条msg中可能有多条弹幕信息
 	 */
-	public void MessageDecode(byte[] msg){		
-		Message messageHelper=new Message();
-		
+	public void MessageDecode(String messageStr){		
 		//将这个json格式的字符串进行处理，获得相应类型的对象
-		Object message = messageHelper.MessageDecode(new String(msg));
-		if(message==null)
+		int indexOfStrEnd;
+		indexOfStrEnd = messageStr.indexOf("{");
+		if(!messageStr.substring(indexOfStrEnd+1, indexOfStrEnd+2).equals("\"")){//开头有问题
+			messageStr = messageStr.substring(messageStr.indexOf("{", indexOfStrEnd+1));//获取可用的子串
+		}
+		indexOfStrEnd=messageStr.indexOf("}}}");
+		if(indexOfStrEnd!=-1){//特殊消息（内容较多的消息）
+			if(indexOfStrEnd+2<messageStr.length()){//存在两条消息
+				MessageDecode(messageStr.substring(messageStr.indexOf("{",indexOfStrEnd)));//生成一个子串作为新的一条json
+			}
+		}
+		else{
+			indexOfStrEnd=messageStr.indexOf("}}");
+			if(indexOfStrEnd==-1)//没有符合条件的json字串
+				return;
+			if(indexOfStrEnd+2<messageStr.length()){//存在两条消息
+				MessageDecode(messageStr.substring(messageStr.indexOf("{",indexOfStrEnd)));//生成一个子串作为新的一条json
+			}
+		}
+		messageReceied = messageHelper.MessageDecode(messageStr);
+		if(messageReceied==null)
 			return;
-		mUIFrame.UpdateDanMu(message);
+		mUIFrame.UpdateDanMu(messageReceied);
 	}
 	public void Close(){
 		if(socket!=null&&os!=null&&is!=null&&socket.isConnected()){

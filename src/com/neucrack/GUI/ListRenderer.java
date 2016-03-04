@@ -43,7 +43,7 @@ public class ListRenderer extends JPanel implements ListCellRenderer<ListItemDan
 		
 		
 		userName.setForeground(new Color(0x6D40DB));
-		symbolAfterUserName.setForeground(Color.gray);
+		symbolAfterUserName.setForeground(Color.yellow);
 		message.setForeground(Color.white);
 		giftNumber.setForeground(new Color(0xFF3C61));
 		giftUnit.setForeground(Color.white);

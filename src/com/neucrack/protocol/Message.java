@@ -4,21 +4,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Message {
-//	//枚举
-//	//消息类型
-//	final static String TYPE_DANMU="1";        //弹幕
-//	final static String TYPE_BAMBOO="206";     //礼物（竹子）
-//	final static String TYPE_RICE_BALLS="306"; //礼物（饭团）
-//	final static String TYPE_GIFT_BROADCAST="311";   //其它房间的礼物（佛跳墙）
-//	final static String TYPE_VISITORS="207";   //房间访客量
 
 	public Object MessageDecode(String message){
 		JSONObject json=null;
-		System.out.println(message);
+//		System.out.println(message);
 		try{
 			json = new JSONObject(message);
 		}catch(JSONException e){
-			
+			System.out.println("信息不完整\n"+message);
 		}
 		return JsonDecode(json);
 	}
