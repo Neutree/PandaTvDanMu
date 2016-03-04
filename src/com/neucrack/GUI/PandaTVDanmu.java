@@ -23,6 +23,7 @@ import javax.swing.border.MatteBorder;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.neucrack.DataPersistence.PreferenceData;
 import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
@@ -38,6 +39,7 @@ import java.awt.GridLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -69,6 +71,7 @@ import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
+import java.util.prefs.Preferences;
 import java.awt.FlowLayout;
 
 import javax.swing.SwingConstants;
@@ -218,29 +221,55 @@ public class PandaTVDanmu extends JFrame {
 			public void mouseReleased(MouseEvent e) {
 				JDialog settingsDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  帮助", null);
 				settingsDialog.setBounds(500, 150, 550, 323);
+				settingsDialog.getContentPane().setLayout(new GridLayout(0, 1));
+				JPanel transparentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+				JPanel rememberRoomIDPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+				JPanel applyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				final JLabel  transparentLabel=new JLabel("透明度 0%");
-				final int maxTransparentValue=90;
-				final JSlider slider = new JSlider(0, maxTransparentValue, maxTransparentValue);
+				final JSlider slider = new JSlider(0, PreferenceData.MAXTRASPARENTVALUE, PreferenceData.MAXTRASPARENTVALUE);
+				final JCheckBox isRemenberRoomID = new JCheckBox("保存房间号");
 				JButton apply = new JButton("应用");
 				slider.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				settingsDialog.getContentPane().setLayout(new FlowLayout());
-				settingsDialog.getContentPane().add(transparentLabel);
-				settingsDialog.getContentPane().add(slider);
-				settingsDialog.getContentPane().add(apply);
+				PreferenceData prefData=new PreferenceData();
+				mTransparentValue = prefData.getmTransparentValue();
+				if(prefData.IsSaveRoomID())
+					isRemenberRoomID.setSelected(true);
+				else
+					isRemenberRoomID.setSelected(false);
+				transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
+				slider.setValue(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue);
+				
+				transparentPanel.add(transparentLabel);
+				transparentPanel.add(slider);
+				rememberRoomIDPanel.add(isRemenberRoomID);
+				applyPanel.add(apply);
+				
+				settingsDialog.getContentPane().add(transparentPanel);
+				settingsDialog.getContentPane().add(rememberRoomIDPanel);
+				settingsDialog.getContentPane().add(applyPanel);
 						
 				settingsDialog.setVisible(true);
+				
 				
 				slider.addChangeListener(new ChangeListener() {
 					@Override
 					public void stateChanged(ChangeEvent e) {
-						mTransparentValue = maxTransparentValue - slider.getValue();
-						transparentLabel.setText("透明度  "+(maxTransparentValue-mTransparentValue)+"% ");
+						mTransparentValue = PreferenceData.MAXTRASPARENTVALUE - slider.getValue();
+						transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
 					}
 				});
 				apply.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						parentPanel.setOpacity((float) ((mTransparentValue+100-maxTransparentValue)/100.0));
+						parentPanel.setOpacity((float) ((mTransparentValue+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
+						PreferenceData prefData=new PreferenceData();
+						prefData.SaveTransparentValue(mTransparentValue);
+						if(isRemenberRoomID.isSelected()){
+							prefData.SaveIsSaveRoomID(true);
+							prefData.SaveRoomID(mRoomID.getText());
+						}
+						else
+							prefData.SaveIsSaveRoomID(false);
 					}
 				}); 
 			}
@@ -281,6 +310,14 @@ public class PandaTVDanmu extends JFrame {
 		
 		mRoomID = new JTextField();
 		mRoomID.setBorder(new EmptyBorder(0,0,0,0));
+		//加载持久化数据
+		PreferenceData prefData=new PreferenceData();
+		if(prefData.IsSaveRoomID()){
+			mRoomID.setText(prefData.GetRoomID());
+		}
+		else{
+			mRoomID.setText(PreferenceData.DEFAULT_ROOMID);
+		}
 		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
 		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomID.gridx = 1;
@@ -299,13 +336,18 @@ public class PandaTVDanmu extends JFrame {
 					mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StopConnection.png"));
 					mPauseAutoScroll.setVisible(true);
 					mPauseAutoScroll.setIcon(new ImageIcon("./resources/pic/StopAutoscroll.png"));
+					PreferenceData prefData = new PreferenceData();
+					if(prefData.IsSaveRoomID())
+						prefData.SaveRoomID(mRoomID.getText());
+					else
+						prefData.SaveRoomID(PreferenceData.DEFAULT_ROOMID);
 				}
 			}
 		});
 		mRoomID.setBackground(Color.DARK_GRAY);
 		mRoomID.setForeground(Color.WHITE);
 		mRoomID.setColumns(10);
-		mRoomID.setText("313180");
+		
 		
 		mStartStopConnection = new JLabel("");
 		mStartStopConnection.setIcon(new ImageIcon("./resources/pic/StartConnection.png"));
@@ -436,7 +478,8 @@ public class PandaTVDanmu extends JFrame {
 		this.setTitle("PandaTVDanMu");
 		this.setUndecorated(true);
 		//AWTUtilities.setWindowOpacity(this, 1f);//设置透明度
-		this.setOpacity(0.6f);
+		mTransparentValue = prefData.getmTransparentValue();
+		this.setOpacity((float) ((mTransparentValue+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
 		this.validate();
 		
 		
@@ -464,6 +507,9 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
+		
+		
+		//全局热键
 		JIntellitype.getInstance().registerHotKey(FUNC_KEY_MARK,0, KeyEvent.VK_F10);
 		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
 			
