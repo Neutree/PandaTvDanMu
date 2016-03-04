@@ -2,7 +2,6 @@ package com.neucrack.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -62,6 +61,10 @@ import javax.swing.SwingConstants;
 
 public class PandaTVDanmu extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4541332569550717643L;
 	private JPanel contentPane;
 	static Point origin = new Point();
 	private JTextField mRoomID;
@@ -73,11 +76,11 @@ public class PandaTVDanmu extends JFrame {
 	private DefaultListModel<ListItemDanMu> mListItem;
 	private int mTransparentValue=0;
 	private boolean mIsChangeFrameSize=false;
+	private int mMaxDanMuDisNumber;
 	//	DefaultListModel listModel;
 	int mMessagelastIndex=0;
 	private ConnectDanMuServer mDanMuConnection;
 	
-	static PandaTVDanmu frame;
 	private JLabel mVisitorNum;
 	private JPanel panel_header_1;
 	private JPanel panel_header_2_left;
@@ -106,7 +109,7 @@ public class PandaTVDanmu extends JFrame {
 				try {
 					String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 					UIManager.setLookAndFeel(lookAndFeel);
-					frame = new PandaTVDanmu();
+					PandaTVDanmu frame = new PandaTVDanmu();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -140,6 +143,8 @@ public class PandaTVDanmu extends JFrame {
 		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(600, 250, 272, 323);
+		
+		mDanMuConnection = new ConnectDanMuServer(this);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new Border(new Color(0,0,0,0.8f), 5, this));
@@ -206,10 +211,14 @@ public class PandaTVDanmu extends JFrame {
 				settingsDialog.getContentPane().setLayout(new GridLayout(0, 1));
 				JPanel transparentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel rememberRoomIDPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+				JPanel disNumber = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel applyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				final JLabel  transparentLabel=new JLabel("透明度 0%");
 				final JSlider slider = new JSlider(0, PreferenceData.MAXTRASPARENTVALUE, PreferenceData.MAXTRASPARENTVALUE);
 				final JCheckBox isRemenberRoomID = new JCheckBox("保存房间号");
+				JLabel disNumberName = new JLabel("保留消息个数");
+				final JTextField disNumberInput = new JTextField();
+				disNumberInput.setColumns(6);
 				JButton apply = new JButton("应用");
 				slider.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				PreferenceData prefData=new PreferenceData();
@@ -224,13 +233,21 @@ public class PandaTVDanmu extends JFrame {
 				transparentPanel.add(transparentLabel);
 				transparentPanel.add(slider);
 				rememberRoomIDPanel.add(isRemenberRoomID);
+				disNumber.add(disNumberName);
+				disNumber.add(disNumberInput);
 				applyPanel.add(apply);
 				
 				settingsDialog.getContentPane().add(transparentPanel);
 				settingsDialog.getContentPane().add(rememberRoomIDPanel);
+				settingsDialog.getContentPane().add(disNumber);
 				settingsDialog.getContentPane().add(applyPanel);
+				
+				
+				disNumberInput.setText(mMaxDanMuDisNumber+"");
+				
 						
 				settingsDialog.setVisible(true);
+				
 				
 				
 				slider.addChangeListener(new ChangeListener() {
@@ -252,6 +269,16 @@ public class PandaTVDanmu extends JFrame {
 						}
 						else
 							prefData.SaveIsSaveRoomID(false);
+						try{
+							mMaxDanMuDisNumber = Integer.parseInt(disNumberInput.getText().trim());
+						}catch(Exception err){
+							JDialog errDialog = new JDialog(parentPanel, "错误", null);
+							errDialog.setBounds(520, 160, 200, 150);
+							JLabel hint = new JLabel("格式填写错误！");
+							errDialog.add(hint);
+							errDialog.setVisible(true);
+						}
+						prefData.SaveDanMuDisNumber(mMaxDanMuDisNumber);
 					}
 				}); 
 			}
@@ -292,6 +319,8 @@ public class PandaTVDanmu extends JFrame {
 		
 		mRoomID = new JTextField();
 		mRoomID.setBorder(new EmptyBorder(0,0,0,0));
+		
+		
 		//加载持久化数据
 		PreferenceData prefData=new PreferenceData();
 		if(prefData.IsSaveRoomID()){
@@ -300,6 +329,8 @@ public class PandaTVDanmu extends JFrame {
 		else{
 			mRoomID.setText(PreferenceData.DEFAULT_ROOMID);
 		}
+		mMaxDanMuDisNumber = prefData.GetDanMuDisNumber();
+		
 		GridBagConstraints gbc_mRoomID = new GridBagConstraints();
 		gbc_mRoomID.insets = new Insets(0, 0, 0, 5);
 		gbc_mRoomID.gridx = 1;
@@ -522,7 +553,6 @@ public class PandaTVDanmu extends JFrame {
 	}
 	private void StartConnection(){
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接中。。。", null, null, null));
-		mDanMuConnection = new ConnectDanMuServer(frame);
 		if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
 			mIsConnectionAlive=true;
 			UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接弹幕服务器成功", null, null, null));
@@ -540,17 +570,13 @@ public class PandaTVDanmu extends JFrame {
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "与弹幕服务器断开连接成功", null, null, null));
 	}
 	public void UpdateDanMu(ListItemDanMu message){
+		while(mListItem.size()>=mMaxDanMuDisNumber)
+			mListItem.removeElementAt(0);
 		mListItem.addElement(message);
-		if(mListItem.getSize()>10){//数据过多，避免占用内存，清理掉
-			mListItem.removeRange(0, mListItem.getSize()-8);
-		}
 		if(mIsAutoScroll){
 			mMessagelastIndex = mListItem.getSize() - 1;
 			if (mMessagelastIndex >= 0) {
-				System.out.println("sise:"+mListItem.getSize()+" "+mMessageList+" "+"index:"+mMessagelastIndex);
-				
 				mMessageList.ensureIndexIsVisible(mMessagelastIndex);
-				System.out.println("b");
 			}
 		}
 	}

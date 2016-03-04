@@ -288,7 +288,7 @@ public class ConnectDanMuServer {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 //					e.printStackTrace();
-					System.out.println(e);
+					System.out.println("ReceiveMessage closed after socket closed:\n"+e);
 				}
 			}
 		}
@@ -338,8 +338,8 @@ public class ConnectDanMuServer {
 				is.close();
 				socket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				System.out.println(e);
 			}
 		}
 	}
