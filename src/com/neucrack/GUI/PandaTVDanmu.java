@@ -19,11 +19,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import com.neucrack.DataPersistence.PreferenceData;
+import com.neucrack.GUI.MyFrame.Border;
 import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
 import com.neucrack.protocol.ConnectDanMuServer;
@@ -62,6 +64,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.ListUI;
 
 import java.awt.Toolkit;
@@ -92,6 +95,7 @@ public class PandaTVDanmu extends JFrame {
 	private boolean mIsAutoScroll=true;
 	private DefaultListModel<ListItemDanMu> mListItem;
 	private int mTransparentValue=0;
+	private boolean mIsChangeFrameSize=false;
 	//	DefaultListModel listModel;
 	int mMessagelastIndex=0;
 	private ConnectDanMuServer mDanMuConnection;
@@ -158,16 +162,17 @@ public class PandaTVDanmu extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(PandaTVDanmu.class.getResource("/pic/icon.png")));
 		setBackground(Color.BLACK);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(1100, 250, 272, 323);
+		setBounds(600, 250, 272, 323);
 		
 		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(new Border(new Color(0,0,0,0.8f), 5, this));
 		contentPane.setOpaque(false);
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panelHeader = new JPanel();
 		panelHeader.setBackground(Color.DARK_GRAY);
+		panelHeader.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		contentPane.add(panelHeader, BorderLayout.NORTH);
 		panelHeader.setOpaque(false);
 		panelHeader.setLayout(new BorderLayout(0, 0));
@@ -417,7 +422,7 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
-		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0,0));
 		scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0,0));
 		scrollPane.setOpaque(false);//设置透明
@@ -447,6 +452,8 @@ public class PandaTVDanmu extends JFrame {
 			public void mousePressed(MouseEvent e) {
 				// 当鼠标按下的时候获得窗口当前的位置
 				if(!mLock){
+					if(mIsChangeFrameSize)
+						return;	
 					origin.x = e.getX();
 					origin.y = e.getY();
 				}
@@ -457,6 +464,8 @@ public class PandaTVDanmu extends JFrame {
 			public void mouseDragged(MouseEvent e) {
 				// 当鼠标拖动时获取窗口当前位置
 				if(!mLock){
+					if(mIsChangeFrameSize)
+						return;					
 					Point p =parentPanel.getLocation();
 					// 设置窗口的位置
 					// 窗口当前的位置 + 鼠标当前在窗口的位置 - 鼠标按下的时候在窗口的位置
@@ -489,6 +498,8 @@ public class PandaTVDanmu extends JFrame {
 			public void mousePressed(MouseEvent e) {
 				// 当鼠标按下的时候获得窗口当前的位置
 				if(!mLock){
+					if(mIsChangeFrameSize)
+						return;	
 					origin.x = e.getX();
 					origin.y = e.getY();
 				}
@@ -499,6 +510,8 @@ public class PandaTVDanmu extends JFrame {
 			public void mouseDragged(MouseEvent e) {
 				// 当鼠标拖动时获取窗口当前位置
 				if(!mLock){
+					if(mIsChangeFrameSize)
+						return;	
 					Point p =parentPanel.getLocation();
 					// 设置窗口的位置
 					// 窗口当前的位置 + 鼠标当前在窗口的位置 - 鼠标按下的时候在窗口的位置
@@ -551,13 +564,16 @@ public class PandaTVDanmu extends JFrame {
 	}
 	public void UpdateDanMu(ListItemDanMu message){
 		mListItem.addElement(message);
-		if(mListItem.getSize()>250){//数据过多，避免占用内存，清理掉
-			mListItem.removeRange(0, mListItem.getSize()-50);
+		if(mListItem.getSize()>10){//数据过多，避免占用内存，清理掉
+			mListItem.removeRange(0, mListItem.getSize()-8);
 		}
 		if(mIsAutoScroll){
-			mMessagelastIndex = mMessageList.getModel().getSize() - 1;
+			mMessagelastIndex = mListItem.getSize() - 1;
 			if (mMessagelastIndex >= 0) {
+				System.out.println("sise:"+mListItem.getSize()+" "+mMessageList+" "+"index:"+mMessagelastIndex);
+				
 				mMessageList.ensureIndexIsVisible(mMessagelastIndex);
+				System.out.println("b");
 			}
 		}
 	}
@@ -570,6 +586,7 @@ public class PandaTVDanmu extends JFrame {
 		mMessageList.setEnabled(false);
 		mHelp.setVisible(false);
 		mCloseWindow.setVisible(false);
+		mSettings.setVisible(false);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mLockHint.setText("F10解锁");
@@ -583,7 +600,8 @@ public class PandaTVDanmu extends JFrame {
 		mHelp.setVisible(true);
 		mCloseWindow.setVisible(true);
 		parentPanel.setEnabled(true);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		mSettings.setVisible(true);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		mLockHint.setText("F10锁定");
 	}
@@ -644,4 +662,154 @@ public class PandaTVDanmu extends JFrame {
 		UpdateDanMu(danMuMessage);
 	}
 
+	
+	
+	//边框缩放
+	class Border extends LineBorder implements MouseInputListener {
+		private static final long serialVersionUID = 1L;
+
+		private JFrame frame;
+		private int delta;
+
+		private Point sp;
+		private Point cp;
+		private int width;
+		private int height;
+
+		private boolean top, bottom, left, right, topLeft, topRight,
+				bottomLeft, bottomRight;
+
+		public Border(Color color, int delta, JFrame frame) {
+			super(color, delta);
+			this.delta = delta;
+			this.frame = frame;
+
+			addMouseMotionListener(this);
+			addMouseListener(this);
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			mIsChangeFrameSize=true;
+			Point dp = e.getLocationOnScreen();
+			// 拖动时的组件原点
+			int ox = dp.x - cp.x;
+			int oy = dp.y - cp.y;
+
+			// 静止的 原点
+			int x = sp.x - cp.x;
+			int y = sp.y - cp.y;
+
+			int h = height;
+			int w = width;
+
+			if (top) {
+				ox = x;
+				h = height + (-dp.y + sp.y);
+			} else if (bottom) {
+				oy = y;
+				ox = x;
+				h = height + (dp.y - sp.y);
+			} else if (left) {
+				oy = y;
+				w = width + (-dp.x + sp.x);
+			} else if (right) {
+				oy = y;
+				ox = x;
+				w = width + (dp.x - sp.x);
+			} else if (topLeft) {
+				h = height + (-dp.y + sp.y);
+				w = width + (-dp.x + sp.x);
+			} else if (topRight) {
+				ox = x;
+				h = height + (-dp.y + sp.y);
+				w = width + (dp.x - sp.x);
+			} else if (bottomLeft) {
+				oy = y;
+				h = height + (-dp.y + sp.y);
+				w = width + (dp.x - sp.x);
+			} else if (bottomRight) {
+				ox = x;
+				oy = y;
+				h = height + (dp.y - sp.y);
+				w = width + (+dp.x - sp.x);
+			}
+			frame.setLocation(ox, oy);
+			frame.setSize(w, h);
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent arg0) {
+			sp = arg0.getLocationOnScreen();
+			cp = arg0.getPoint();
+			width = frame.getWidth();
+			height = frame.getHeight();
+
+			top = cp.x > delta && cp.x < width - delta && cp.y <= delta;
+			bottom = cp.x > delta && cp.x < width - delta
+					&& cp.y >= height - delta;
+			left = cp.x <= delta && cp.y > delta && cp.y < height - delta;
+			right = cp.x >= width - delta && cp.y > delta
+					&& cp.y < height - delta;
+
+			topLeft = cp.x <= delta && cp.y <= delta;
+			topRight = cp.x >= width - delta && cp.y <= delta;
+
+			bottomLeft = cp.x <= delta && cp.y >= height - delta;
+			bottomRight = cp.x >= width - delta && cp.y >= height - delta;
+
+			if (top) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+				return;
+			} else if (bottom) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+			} else if (left) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+			} else if (right) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+			} else if (topLeft) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
+			} else if (topRight) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR));
+			} else if (bottomLeft) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR));
+			} else if (bottomRight) {
+				frame.setCursor(Cursor
+						.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR));
+			}
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			mIsChangeFrameSize=true;
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			mIsChangeFrameSize=false;
+			frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+		}
+
+	}
+	
+		
 }

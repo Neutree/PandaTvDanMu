@@ -274,7 +274,7 @@ public class ConnectDanMuServer {
 									byte[] msg=new byte[mssageLength];//存放消息体
 									is.read(msg);//读消息体,msg即为弹幕消息体，格式为json格式
 									//解析消息体
-									MessageDecode(new String(msg));
+									MessageDecode(new String(msg,"UTF-8"));
 								}
 							}
 						}
@@ -304,12 +304,16 @@ public class ConnectDanMuServer {
 		int indexOfStrEnd;
 		indexOfStrEnd = messageStr.indexOf("{");
 		if(!messageStr.substring(indexOfStrEnd+1, indexOfStrEnd+2).equals("\"")){//开头有问题
-			messageStr = messageStr.substring(messageStr.indexOf("{", indexOfStrEnd+1));//获取可用的子串
+			int index=messageStr.indexOf("{",indexOfStrEnd+1);
+			if(index!=-1)
+				messageStr = messageStr.substring(messageStr.indexOf("{", indexOfStrEnd+1));//获取可用的子串
 		}
 		indexOfStrEnd=messageStr.indexOf("}}}");
 		if(indexOfStrEnd!=-1){//特殊消息（内容较多的消息）
 			if(indexOfStrEnd+2<messageStr.length()){//存在两条消息
-				MessageDecode(messageStr.substring(messageStr.indexOf("{",indexOfStrEnd)));//生成一个子串作为新的一条json
+				int index=messageStr.indexOf("{",indexOfStrEnd);
+				if(index!=-1)
+					MessageDecode(messageStr.substring(index));//生成一个子串作为新的一条json
 			}
 		}
 		else{
