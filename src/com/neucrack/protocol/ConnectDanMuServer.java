@@ -315,9 +315,12 @@ public class ConnectDanMuServer {
 									mIsSendHeartbeatPack = false; //收到服务器对心跳包的响应，标志复位
 								}
 						else{
-							System.out.println(receivMsgFlag[0]+" "+receivMsgFlag[1]+" "+
-									receivMsgFlag[2]+" "+
-									receivMsgFlag[3]+" ");
+							System.out.println(Integer.toHexString(receivMsgFlag[0])+" "+Integer.toHexString(receivMsgFlag[1])+" "+
+									Integer.toHexString(receivMsgFlag[2])+" "+
+									Integer.toHexString(receivMsgFlag[3])+" ");
+							System.out.println((char)receivMsgFlag[0]+" "+(char)receivMsgFlag[1]+" "+
+									(char)receivMsgFlag[2]+" "+
+									(char)receivMsgFlag[3]+" ");
 						}
 					}
 					

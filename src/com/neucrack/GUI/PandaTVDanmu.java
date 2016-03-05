@@ -9,12 +9,15 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import com.neucrack.DataPersistence.PreferenceData;
@@ -74,7 +77,7 @@ public class PandaTVDanmu extends JFrame {
 	private boolean mIsConnectionAlive=false;
 	private boolean mIsAutoScroll=true;
 	private DefaultListModel<ListItemDanMu> mListItem;
-	private int mTransparentValue=0;
+	private int mTransparentValue=0,mTransparentValueBefore=0;
 	private boolean mIsChangeFrameSize=false;
 	private int mMaxDanMuDisNumber;
 	//	DefaultListModel listModel;
@@ -206,7 +209,62 @@ public class PandaTVDanmu extends JFrame {
 		mSettings.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				JDialog settingsDialog = new JDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  设置", null);
+				class MyJDialog extends JDialog implements WindowListener{
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 6317261328052074874L;
+
+					public MyJDialog(JFrame parentPanel, String string) {
+						super(parentPanel,string);
+						this.addWindowListener((WindowListener) this);
+					}
+
+					@Override
+					public void windowOpened(WindowEvent e) {
+						// TODO Auto-generated method stub
+//						System.out.println("1");
+					}
+
+					@Override
+					public void windowClosing(WindowEvent e) {
+						// TODO Auto-generated method stub
+//						System.out.println("2");
+					}
+
+					@Override
+					public void windowClosed(WindowEvent e) {
+//						System.out.println("3");
+					}
+
+					@Override
+					public void windowIconified(WindowEvent e) {
+						// TODO Auto-generated method stub
+//						System.out.println("4");
+					}
+
+					@Override
+					public void windowDeiconified(WindowEvent e) {
+//						System.out.println("5");
+						
+					}
+
+					@Override
+					public void windowActivated(WindowEvent e) {
+//						System.out.println("6");
+						mTransparentValueBefore = mTransparentValue;
+					}
+
+					@Override
+					public void windowDeactivated(WindowEvent e) {
+//						System.out.println("7");
+						parentPanel.setOpacity((float) ((mTransparentValueBefore+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
+					}
+					
+				}
+				
+				MyJDialog settingsDialog = new MyJDialog(parentPanel, "Neucrack_PandaTV 弹幕助手  设置");
 				settingsDialog.setBounds(500, 150, 350, 250);
 				settingsDialog.getContentPane().setLayout(new GridLayout(0, 1));
 				JPanel transparentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -255,12 +313,14 @@ public class PandaTVDanmu extends JFrame {
 					public void stateChanged(ChangeEvent e) {
 						mTransparentValue = PreferenceData.MAXTRASPARENTVALUE - slider.getValue();
 						transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
+						parentPanel.setOpacity((float) ((mTransparentValue+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
 					}
 				});
 				apply.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
 						parentPanel.setOpacity((float) ((mTransparentValue+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
+						mTransparentValueBefore = mTransparentValue;
 						PreferenceData prefData=new PreferenceData();
 						prefData.SaveTransparentValue(mTransparentValue);
 						if(isRemenberRoomID.isSelected()){
@@ -281,8 +341,10 @@ public class PandaTVDanmu extends JFrame {
 						prefData.SaveDanMuDisNumber(mMaxDanMuDisNumber);
 					}
 				}); 
+				
 			}
 		});
+		
 		mSettings.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/settings.png")));
 		panel_2_right.add(mSettings);
 		panel_2_right.add(mHelp);

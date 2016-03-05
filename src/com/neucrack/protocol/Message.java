@@ -79,8 +79,11 @@ public class Message {
 				gift.mContentNewBamboos = json.getJSONObject("data").getJSONObject("content").getString("newBamboos");
 				message = gift;
 			}
+			else if(type.equals(GiftOtherRoom.Code)){//其它房间的大礼物
+				System.out.println("其它房间送的大礼物："+json.toString());
+			}
 			else{
-				System.out.println("未知类型数据");
+				System.out.println("未知类型数据 Code:"+type+"\n内容："+json.toString());
 			}
 		}catch(JSONException e){
 			System.out.println(e);
