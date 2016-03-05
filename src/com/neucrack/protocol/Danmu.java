@@ -19,4 +19,26 @@ public class Danmu {
 	
 	//评论内容
 	public String mContent;
+
+	public Danmu(long mTime, int mQid, String mRoomID, String mIdentity,
+			String mRid, String mPlatform, String mNickName, String mUserName,
+			String mLevel, String mContent) {
+		super();
+		this.mTime = mTime;
+		this.mQid = mQid;
+		this.mRoomID = mRoomID;
+		this.mIdentity = mIdentity;
+		this.mRid = mRid;
+		this.mPlatform = mPlatform;
+		this.mNickName = mNickName;
+		this.mUserName = mUserName;
+		this.mLevel = mLevel;
+		this.mContent = mContent;
+	}
+
+	public Danmu() {
+		super();
+	}
+	
+	
 }

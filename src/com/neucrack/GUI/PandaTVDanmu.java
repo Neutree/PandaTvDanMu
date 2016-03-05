@@ -370,8 +370,6 @@ public class PandaTVDanmu extends JFrame {
 			public void mouseReleased(MouseEvent e) {
 				if(mIsConnectionAlive){
 					CloseConnection();
-					mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
-					mPauseAutoScroll.setVisible(false);
 				}
 				else{
 					StartConnection();
@@ -562,11 +560,13 @@ public class PandaTVDanmu extends JFrame {
 			UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接弹幕服务器失败！！", null, null, null));
 		}
 	}
-	private void CloseConnection(){
+	public void CloseConnection(){
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "断开连接中。。。", null, null, null));
 		if(mDanMuConnection!=null)
 			mDanMuConnection.Close();
 		mIsConnectionAlive=false;
+		mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
+		mPauseAutoScroll.setVisible(false);
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "与弹幕服务器断开连接成功", null, null, null));
 	}
 	public void UpdateDanMu(ListItemDanMu message){

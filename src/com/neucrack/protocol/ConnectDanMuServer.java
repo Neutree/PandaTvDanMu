@@ -21,8 +21,11 @@ public class ConnectDanMuServer {
 	final static byte[] RESPONSE = {0x00,0x06,0x00,0x06};  //连接弹幕服务器响应
 	final static byte[] KEEPALIVE= {0x00,0x06,0x00,0x00};  //与弹幕服务器心跳心跳保持
 	final static byte[] RECEIVEMSG= {0x00,0x06,0x00,0x03}; //接收到消息
+	final static byte[] HEARTBEATRESPONSE ={0x00,0x06,0x00,0x01};//心跳保持服务器返回的值
 	final static String DANMUSERVERURL="http://www.panda.tv/ajax_chatinfo";
 	final static int IGNOREBYTELENGTH = 16;//弹幕消息体忽略的字节数
+	
+	final static int MAX_AUTO_CONNECT_TIME = 5;//自动断线重连次数
 	
 	static int count=0,count2=0;
 	private int mRid;
@@ -42,6 +45,9 @@ public class ConnectDanMuServer {
 	DataInputStream  is=null;
 	private boolean mIsHeartBeatThreadStop=true;
 	private boolean mIsReceivMsgThreadStop=true;
+	
+	private String mRoomID;
+	private boolean mIsSendHeartbeatPack=false;
 	
 	private PandaTVDanmu mUIFrame=null;
 	
@@ -156,6 +162,7 @@ public class ConnectDanMuServer {
 	}
 	
 	public boolean ConnectToDanMuServer(String roomID) {
+		mRoomID = roomID;
 		boolean isSuccess=false;
 		String result="";
 		JSONObject json;
@@ -219,13 +226,35 @@ public class ConnectDanMuServer {
 	}
 	//实现Runnable的内，用来作为一个新线程与弹幕服务器保持连接（心跳）
 	private class HeartBeat implements Runnable{
-
+		byte[] heartBeatRsponse=new byte[4];
+		int autoConnectedTime=0;
 		@Override
 		public void run() {
 			while(!mIsHeartBeatThreadStop){
 				try {
 					os.write(KEEPALIVE);
-					System.out.println("保持连接");
+					if(mIsSendHeartbeatPack){//没有接收到响应，已经与服务器断开了
+						//连接断开,自动重新连接
+						ConnectToDanMuServer(mRoomID);
+						++autoConnectedTime;
+						if(autoConnectedTime>MAX_AUTO_CONNECT_TIME){//超过最大断线重连次数
+							mUIFrame.UpdateDanMu(new Danmu(1, 1, "", "30", "", "", "重连次数达到最大！", "", "1", ""));
+							autoConnectedTime=0;
+							mUIFrame.CloseConnection();
+						}
+						else{
+							try {
+								Thread.sleep(2000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							continue;
+						}
+					}
+					autoConnectedTime=0;//能走到这里，表示连接正常，所以对断线重连计数置零
+					mIsSendHeartbeatPack=true;//标志已经发送给了服务器心跳包
+					System.out.println("心跳");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -278,6 +307,13 @@ public class ConnectDanMuServer {
 								}
 							}
 						}
+						else if(receivMsgFlag[0]==HEARTBEATRESPONSE[0]
+								&&receivMsgFlag[1]==HEARTBEATRESPONSE[1]
+										&&receivMsgFlag[2]==HEARTBEATRESPONSE[2]
+										&&receivMsgFlag[3]==HEARTBEATRESPONSE[3]){
+									//连接正常
+									mIsSendHeartbeatPack = false; //收到服务器对心跳包的响应，标志复位
+								}
 						else{
 							System.out.println(receivMsgFlag[0]+" "+receivMsgFlag[1]+" "+
 									receivMsgFlag[2]+" "+
