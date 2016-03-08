@@ -107,6 +107,7 @@ public class PandaTVDanmu extends JFrame {
 	SpeechSynthesizer mTts;
 	private String mVoiceName;
 	private boolean mIsVoicing=false;
+	private boolean mIsEnableVoice=false;
 	
 	//定义热键标识，用于在设置多个热键时，在事件处理中区分用户按下的热键 
 	public static final int FUNC_KEY_MARK = 1;
@@ -288,7 +289,8 @@ public class PandaTVDanmu extends JFrame {
 				final JCheckBox isRemenberRoomID = new JCheckBox("保存房间号");
 				JLabel disNumberName = new JLabel("保留消息个数");
 				final JTextField disNumberInput = new JTextField();
-				JLabel voiceName=new JLabel("人物");
+				final JCheckBox isEnableVoice = new JCheckBox("使能语音");
+				JLabel voiceName=new JLabel("人物");				
 				Vector<String> str = new Vector<String>();
 				str.add("小燕");
 				str.add("小宇");
@@ -307,6 +309,12 @@ public class PandaTVDanmu extends JFrame {
 					isRemenberRoomID.setSelected(false);
 				transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
 				slider.setValue(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue);
+				
+				mIsEnableVoice = prefData.GetIsEnableVoice();
+				if(mIsEnableVoice)
+					isEnableVoice.setSelected(true);
+				else
+					isEnableVoice.setSelected(false);
 				mVoiceName = prefData.GetVoiceName();
 				if(mVoiceName.equals("xiaoyan"))
 					comboBox.setSelectedItem("小燕");
@@ -325,6 +333,7 @@ public class PandaTVDanmu extends JFrame {
 				rememberRoomIDPanel.add(isRemenberRoomID);
 				disNumber.add(disNumberName);
 				disNumber.add(disNumberInput);
+				voiceSetting.add(isEnableVoice);
 				voiceSetting.add(voiceName);
 				voiceSetting.add(comboBox);
 				applyPanel.add(apply);
@@ -387,6 +396,15 @@ public class PandaTVDanmu extends JFrame {
 							mVoiceName = "xiaorong";
 						prefData.SaveVoiceName(mVoiceName);
 						mTts.setParameter(SpeechConstant.VOICE_NAME, mVoiceName);//设置发音人
+						
+						if(isEnableVoice.isSelected()){
+							mIsEnableVoice = true;
+							prefData.SaveIsEnableVoicee(true);
+						}
+						else{
+							mIsEnableVoice = false;
+							prefData.SaveIsEnableVoicee(false);
+						}
 						
 					}
 				}); 
@@ -660,6 +678,7 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
+		mIsEnableVoice = prefData.GetIsEnableVoice();
 		mVoiceName = prefData.GetVoiceName();
 		SpeechUtility.createUtility(SpeechConstant.APPID+"=56849aec");
 
@@ -778,10 +797,12 @@ public class PandaTVDanmu extends JFrame {
 				danMuMessage.setSymbolAfterUserName(" ");
 			danMuMessage.setUserName(userName);
 			danMuMessage.setMessage(danmu.mContent);
-			if(!mIsVoicing){
-				mIsVoicing = true;
-				//3.开始合成
-				mTts.startSpeaking(danmu.mContent, mSynListener);
+			if(mIsEnableVoice){
+				if(!mIsVoicing){
+					mIsVoicing = true;
+					//3.开始合成
+					mTts.startSpeaking(danmu.mContent, mSynListener);
+				}
 			}
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子

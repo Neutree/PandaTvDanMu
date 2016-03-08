@@ -12,6 +12,7 @@ public class PreferenceData {
 	private final String KEY_DANMU_DIS_NUMBER="danMuDisNumber";
 	public final static String DEFAULT_ROOMID="313180";
 	private final String KEY_VOICE_NAME = "voiceName";
+	private final String KEY_ENABLE_VOICE = "isEnableVoice";
 	public final String DEFAULT_VOICE_NAME = "xiaoyan";
 	
 	
@@ -58,4 +59,12 @@ public class PreferenceData {
 	public String GetVoiceName(){
 		return prefs.get(KEY_VOICE_NAME,DEFAULT_VOICE_NAME);
 	}
+	public boolean SaveIsEnableVoicee(boolean enableVoice){
+		prefs.putBoolean(KEY_ENABLE_VOICE, enableVoice);
+		return true;
+	}
+	public boolean GetIsEnableVoice(){
+		return prefs.getBoolean(KEY_ENABLE_VOICE,false);
+	}
+	
 }
