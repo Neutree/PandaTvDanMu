@@ -18,6 +18,11 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import com.iflytek.cloud.speech.SpeechConstant;
+import com.iflytek.cloud.speech.SpeechError;
+import com.iflytek.cloud.speech.SpeechSynthesizer;
+import com.iflytek.cloud.speech.SpeechUtility;
+import com.iflytek.cloud.speech.SynthesizerListener;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import com.neucrack.DataPersistence.PreferenceData;
@@ -34,6 +39,7 @@ import java.awt.GridLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -58,6 +64,7 @@ import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.FlowLayout;
+import java.util.Vector;
 
 import javax.swing.SwingConstants;
 
@@ -96,6 +103,10 @@ public class PandaTVDanmu extends JFrame {
 	private JLabel mPauseAutoScroll;
 	private JScrollPane scrollPane;
 	private JLabel mHelp;
+	
+	SpeechSynthesizer mTts;
+	private String mVoiceName;
+	private boolean mIsVoicing=false;
 	
 	//定义热键标识，用于在设置多个热键时，在事件处理中区分用户按下的热键 
 	public static final int FUNC_KEY_MARK = 1;
@@ -270,12 +281,21 @@ public class PandaTVDanmu extends JFrame {
 				JPanel transparentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel rememberRoomIDPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel disNumber = new JPanel(new FlowLayout(FlowLayout.CENTER));
+				JPanel voiceSetting = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				JPanel applyPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 				final JLabel  transparentLabel=new JLabel("透明度 0%");
 				final JSlider slider = new JSlider(0, PreferenceData.MAXTRASPARENTVALUE, PreferenceData.MAXTRASPARENTVALUE);
 				final JCheckBox isRemenberRoomID = new JCheckBox("保存房间号");
 				JLabel disNumberName = new JLabel("保留消息个数");
 				final JTextField disNumberInput = new JTextField();
+				JLabel voiceName=new JLabel("人物");
+				Vector<String> str = new Vector<String>();
+				str.add("小燕");
+				str.add("小宇");
+				str.add("小峰");
+				str.add("小梅");
+				str.add("小蓉");
+				final JComboBox<String> comboBox = new JComboBox<String>(str);
 				disNumberInput.setColumns(6);
 				JButton apply = new JButton("应用");
 				slider.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -287,17 +307,32 @@ public class PandaTVDanmu extends JFrame {
 					isRemenberRoomID.setSelected(false);
 				transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
 				slider.setValue(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue);
+				mVoiceName = prefData.GetVoiceName();
+				if(mVoiceName.equals("xiaoyan"))
+					comboBox.setSelectedItem("小燕");
+				else if(mVoiceName.equals("xiaoyu"))
+					comboBox.setSelectedItem("小宇");
+				else if(mVoiceName.equals("xiaofeng"))
+					comboBox.setSelectedItem("小峰");
+				else if(mVoiceName.equals("xiaomei"))
+					comboBox.setSelectedItem("小梅");
+				else if(mVoiceName.equals("xiaorong"))
+					comboBox.setSelectedItem("小蓉");
+				
 				
 				transparentPanel.add(transparentLabel);
 				transparentPanel.add(slider);
 				rememberRoomIDPanel.add(isRemenberRoomID);
 				disNumber.add(disNumberName);
 				disNumber.add(disNumberInput);
+				voiceSetting.add(voiceName);
+				voiceSetting.add(comboBox);
 				applyPanel.add(apply);
 				
 				settingsDialog.getContentPane().add(transparentPanel);
 				settingsDialog.getContentPane().add(rememberRoomIDPanel);
 				settingsDialog.getContentPane().add(disNumber);
+				settingsDialog.getContentPane().add(voiceSetting);
 				settingsDialog.getContentPane().add(applyPanel);
 				
 				
@@ -339,6 +374,20 @@ public class PandaTVDanmu extends JFrame {
 							errDialog.setVisible(true);
 						}
 						prefData.SaveDanMuDisNumber(mMaxDanMuDisNumber);
+						
+						if(comboBox.getSelectedItem().equals("小燕"))
+							mVoiceName = "xiaoyan";
+						else if(comboBox.getSelectedItem().equals("小宇"))
+							mVoiceName = "xiaoyu";
+						else if(comboBox.getSelectedItem().equals("小峰"))
+							mVoiceName = "xiaofeng";
+						else if(comboBox.getSelectedItem().equals("小梅"))
+							mVoiceName = "xiaomei";
+						else if(comboBox.getSelectedItem().equals("小蓉"))
+							mVoiceName = "xiaorong";
+						prefData.SaveVoiceName(mVoiceName);
+						mTts.setParameter(SpeechConstant.VOICE_NAME, mVoiceName);//设置发音人
+						
 					}
 				}); 
 				
@@ -610,7 +659,40 @@ public class PandaTVDanmu extends JFrame {
 				}
 			}
 		});
+		
+		mVoiceName = prefData.GetVoiceName();
+		SpeechUtility.createUtility(SpeechConstant.APPID+"=56849aec");
+
+		//1.创建 SpeechSynthesizer 对象
+		mTts= SpeechSynthesizer.createSynthesizer( );
+		//2.合成参数设置，详见《iFlytek MSC Reference Manual》SpeechSynthesizer 类
+		mTts.setParameter(SpeechConstant.VOICE_NAME, mVoiceName);//设置发音人
+		mTts.setParameter(SpeechConstant.SPEED, "50");//设置语速
+		mTts.setParameter(SpeechConstant.VOLUME, "80");//设置音量，范围 0~100
+		//设置合成音频保存位置（可自定义保存位置），保存在“./iflytek.pcm”
+		//如果不需要保存合成音频，注释该行代码
+		mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, null);
 	}
+	//合成监听器
+		private SynthesizerListener mSynListener = new SynthesizerListener(){
+		//会话结束回调接口，没有错误时，error为null
+		public void onCompleted(SpeechError error) {
+			mIsVoicing = false;
+		}
+		//缓冲进度回调
+		//percent为缓冲进度0~100，beginPos为缓冲音频在文本中开始位置，endPos表示缓冲音频在
+		public void onBufferProgress(int percent, int beginPos, int endPos, String info) {}
+		//开始播放
+		public void onSpeakBegin() {}
+		//暂停播放
+		public void onSpeakPaused() {}
+		//播放进度回调
+		//percent为播放进度0~100,beginPos为播放音频在文本中开始位置，endPos表示播放音频在
+		public void onSpeakProgress(int percent, int beginPos, int endPos) {}
+		//恢复播放回调接口
+		public void onSpeakResumed() {}
+		};
+
 	private void StartConnection(){
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接中。。。", null, null, null));
 		if(mDanMuConnection.ConnectToDanMuServer(mRoomID.getText().trim())){//连接成功
@@ -696,6 +778,11 @@ public class PandaTVDanmu extends JFrame {
 				danMuMessage.setSymbolAfterUserName(" ");
 			danMuMessage.setUserName(userName);
 			danMuMessage.setMessage(danmu.mContent);
+			if(!mIsVoicing){
+				mIsVoicing = true;
+				//3.开始合成
+				mTts.startSpeaking(danmu.mContent, mSynListener);
+			}
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子
 			Bamboo bamboo = (Bamboo) message;

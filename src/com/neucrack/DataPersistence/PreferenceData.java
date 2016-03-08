@@ -11,6 +11,9 @@ public class PreferenceData {
 	private final String KEY_ROOMID="roomID";
 	private final String KEY_DANMU_DIS_NUMBER="danMuDisNumber";
 	public final static String DEFAULT_ROOMID="313180";
+	private final String KEY_VOICE_NAME = "voiceName";
+	public final String DEFAULT_VOICE_NAME = "xiaoyan";
+	
 	
 	Preferences prefs; 
 	
@@ -47,5 +50,12 @@ public class PreferenceData {
 	}
 	public int GetDanMuDisNumber(){
 		return prefs.getInt(KEY_DANMU_DIS_NUMBER,MAX_DANMU_NUMBER_DEFAULT);
+	}
+	public boolean SaveVoiceName(String voiceName){
+		prefs.put(KEY_VOICE_NAME, voiceName);
+		return true;
+	}
+	public String GetVoiceName(){
+		return prefs.get(KEY_VOICE_NAME,DEFAULT_VOICE_NAME);
 	}
 }
