@@ -108,6 +108,7 @@ public class PandaTVDanmu extends JFrame {
 	private String mVoiceName;
 	private boolean mIsVoicing=false;
 	private boolean mIsEnableVoice=false;
+	private Vector<String> mVoiceContent = new Vector<String>();
 	
 	//定义热键标识，用于在设置多个热键时，在事件处理中区分用户按下的热键 
 	public static final int FUNC_KEY_MARK = 1;
@@ -680,7 +681,7 @@ public class PandaTVDanmu extends JFrame {
 		
 		mIsEnableVoice = prefData.GetIsEnableVoice();
 		mVoiceName = prefData.GetVoiceName();
-		SpeechUtility.createUtility(SpeechConstant.APPID+"=56849aec");
+		SpeechUtility.createUtility(SpeechConstant.APPID+"="+PreferenceData.TTS_APPID);
 
 		//1.创建 SpeechSynthesizer 对象
 		mTts= SpeechSynthesizer.createSynthesizer( );
@@ -696,7 +697,17 @@ public class PandaTVDanmu extends JFrame {
 		private SynthesizerListener mSynListener = new SynthesizerListener(){
 		//会话结束回调接口，没有错误时，error为null
 		public void onCompleted(SpeechError error) {
-			mIsVoicing = false;
+			if(mVoiceContent.size()>0){
+				mTts.startSpeaking(mVoiceContent.get(0), mSynListener);
+				mVoiceContent.remove(0);//移除已经添加到语音中的
+			}
+			else{
+				mIsVoicing = false;
+			}
+			int speed = mVoiceContent.size()*10+49;
+			if(speed>100)
+				speed=100;
+			mTts.setParameter(SpeechConstant.SPEED,speed+"");
 		}
 		//缓冲进度回调
 		//percent为缓冲进度0~100，beginPos为缓冲音频在文本中开始位置，endPos表示缓冲音频在
@@ -731,6 +742,7 @@ public class PandaTVDanmu extends JFrame {
 		mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 		mPauseAutoScroll.setVisible(false);
 		UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "与弹幕服务器断开连接成功", null, null, null));
+		mVoiceContent.clear();
 	}
 	public void UpdateDanMu(ListItemDanMu message){
 		while(mListItem.size()>=mMaxDanMuDisNumber)
@@ -803,6 +815,10 @@ public class PandaTVDanmu extends JFrame {
 					//3.开始合成
 					mTts.startSpeaking(danmu.mContent, mSynListener);
 				}
+				else
+				{
+					mVoiceContent.add(danmu.mContent);
+				}
 			}
 		}
 		else if(message.getClass().equals(Bamboo.class)){//竹子
@@ -815,6 +831,17 @@ public class PandaTVDanmu extends JFrame {
 			danMuMessage.setGiftNumber(bamboo.mContent);
 			danMuMessage.setGiftUnit("个");
 			danMuMessage.setGiftName("竹子");
+			if(mIsEnableVoice){
+				if(!mIsVoicing){
+					mIsVoicing = true;
+					//3.开始合成
+					mTts.startSpeaking("感谢 ！ "+bamboo.mNickName+"送的"+bamboo.mContent+"个竹子", mSynListener);
+				}
+				else
+				{
+					mVoiceContent.add("感谢 ！"+bamboo.mNickName+"送的"+bamboo.mContent+"个竹子");
+				}
+			}
 		}
 		else if(message.getClass().equals(Visitors.class)){//访客数量
 			Visitors visitor = (Visitors) message;
@@ -831,6 +858,17 @@ public class PandaTVDanmu extends JFrame {
 			danMuMessage.setGiftNumber(gift.mContentCombo);
 			danMuMessage.setGiftUnit("个");
 			danMuMessage.setGiftName(gift.mContentName);
+			if(mIsEnableVoice){
+				if(!mIsVoicing){
+					mIsVoicing = true;
+					//3.开始合成
+					mTts.startSpeaking("感谢 ！ "+gift.mNickName+"送的"+gift.mContentCombo+"个"+gift.mContentName, mSynListener);
+				}
+				else
+				{
+					mVoiceContent.add("感谢 ！"+gift.mNickName+"送的"+gift.mContentCombo+"个"+gift.mContentName);
+				}
+			}
 		}
 		UpdateDanMu(danMuMessage);
 	}

@@ -15,6 +15,8 @@ public class PreferenceData {
 	private final String KEY_ENABLE_VOICE = "isEnableVoice";
 	public final String DEFAULT_VOICE_NAME = "xiaoyan";
 	
+	public final static String TTS_APPID = "56849aec";
+	
 	
 	Preferences prefs; 
 	
