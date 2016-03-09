@@ -708,19 +708,30 @@ public class PandaTVDanmu extends JFrame {
 			if(speed>100)
 				speed=100;
 			mTts.setParameter(SpeechConstant.SPEED,speed+"");
+//			System.out.println("complete");
 		}
 		//缓冲进度回调
 		//percent为缓冲进度0~100，beginPos为缓冲音频在文本中开始位置，endPos表示缓冲音频在
-		public void onBufferProgress(int percent, int beginPos, int endPos, String info) {}
+		public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
+//			System.out.println("buffer progress");
+		}
 		//开始播放
-		public void onSpeakBegin() {}
+		public void onSpeakBegin() {
+//			System.out.println("speak begin");
+		}
 		//暂停播放
-		public void onSpeakPaused() {}
+		public void onSpeakPaused() {
+//			System.out.println("speak paused");
+		}
 		//播放进度回调
 		//percent为播放进度0~100,beginPos为播放音频在文本中开始位置，endPos表示播放音频在
-		public void onSpeakProgress(int percent, int beginPos, int endPos) {}
+		public void onSpeakProgress(int percent, int beginPos, int endPos) {
+//			System.out.println("speak progress");
+		}
 		//恢复播放回调接口
-		public void onSpeakResumed() {}
+		public void onSpeakResumed() {
+//			System.out.println("speak resumed");
+		}
 		};
 
 	private void StartConnection(){
@@ -731,6 +742,8 @@ public class PandaTVDanmu extends JFrame {
 		}
 		else{
 			mIsConnectionAlive=false;
+			mPauseAutoScroll.setVisible(false);
+			mStartStopConnection.setIcon(new ImageIcon(PandaTVDanmu.class.getResource("/pic/StartConnection.png")));
 			UpdateDanMu(new ListItemDanMu(false, false, null, "", "", "连接弹幕服务器失败！！", null, null, null));
 		}
 	}
