@@ -8,6 +8,7 @@ import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -25,6 +26,7 @@ import com.iflytek.cloud.speech.SpeechUtility;
 import com.iflytek.cloud.speech.SynthesizerListener;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
+import com.neucrack.AutoUpdata.AutoUpdata;
 import com.neucrack.DataPersistence.PreferenceData;
 import com.neucrack.Help_Update.Help;
 import com.neucrack.protocol.Bamboo;
@@ -64,6 +66,7 @@ import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.FlowLayout;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.SwingConstants;
@@ -692,6 +695,70 @@ public class PandaTVDanmu extends JFrame {
 		//设置合成音频保存位置（可自定义保存位置），保存在“./iflytek.pcm”
 		//如果不需要保存合成音频，注释该行代码
 		mTts.setParameter(SpeechConstant.TTS_AUDIO_PATH, null);
+		
+		
+		//自动检测工版本更新
+		final String latestVersionAddr = AutoUpdata.DetectLatestVersion();
+		if(latestVersionAddr!=null){//有最新版
+			JDialog hint = new JDialog(parentPanel, "有新版本发布啦。。。。");
+			hint.setBounds(600, 250, 250, 150);
+			hint.setLayout(new GridLayout(0, 1) );
+			JLabel text = new JLabel("当前版本："+AutoUpdata.VERSION+"\r\n最新:"+latestVersionAddr.substring(latestVersionAddr.indexOf("download/V")+9, latestVersionAddr.indexOf("/", latestVersionAddr.indexOf("download/V")+10)));
+			JButton confirmButton =   new JButton("更新", null);
+			hint.add(text);
+			hint.add(confirmButton);
+			hint.setVisible(true);
+			hint.setFocusable(true);
+			confirmButton.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					 
+				}
+				
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					// TODO Auto-generated method stub
+					java.net.URI uri = java.net.URI.create(latestVersionAddr);
+					// 获取当前系统桌面扩展 
+				    java.awt.Desktop dp = java.awt.Desktop.getDesktop(); 
+				    // 判断系统桌面是否支持要执行的功能 
+				    if (dp.isSupported(java.awt.Desktop.Action.BROWSE)) { 
+				     //File file = new File("D:\\aa.txt"); 
+				     //dp.edit(file);// 　编辑文件 
+				      try {
+						dp.browse(uri);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}// 获取系统默认浏览器打开链接 
+				     // dp.open(file);// 用默认方式打开文件 
+				     // dp.print(file);// 用打印机打印文件 
+				    }
+				}
+			});
+			
+			
+		}
 	}
 	//合成监听器
 		private SynthesizerListener mSynListener = new SynthesizerListener(){
