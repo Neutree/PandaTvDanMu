@@ -8,7 +8,7 @@ public class AutoUpdata {
 	public static final String UPDATA_ADDRESS = "/Neutree/PandaTvDanMu/releases/download/";
 	public static final String RELEASE_ADDRESS = "https://github.com/Neutree/PandaTvDanMu/releases";
 	
-	public static final String VERSION  = "V0.2.4";
+	public static final String VERSION  = "V0.2.6";
 	
 	public static  String DetectLatestVersion(){
 		String result = HttpRequest.sendGet(RELEASE_ADDRESS, null);
