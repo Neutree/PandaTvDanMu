@@ -32,5 +32,5 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 
 # 反馈与参与
 * [源码托管地址](https://github.com/Neutree/PandaTvDanMu)
-* 如果有疑问或者有建议，欢迎添加issues，不会用github（这个网站）的，可以到[这里](http://neucrack.com/409)评论
+* 如果有疑问或者有建议，欢迎添加issues或者[![Gitter](https://badges.gitter.im/Neutree/PandaTvDanMu.svg)](https://gitter.im/Neutree/PandaTvDanMu?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)，不会用github（这个网站）的，可以到[这里](http://neucrack.com/409)评论
 * 可以pull request
