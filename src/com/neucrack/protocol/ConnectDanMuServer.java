@@ -116,8 +116,8 @@ public class ConnectDanMuServer {
 		String danMuAddress = jsonArray.getString(0);
 		mIP = danMuAddress.split(":")[0];
 		mPort = Integer.parseInt(danMuAddress.split(":")[1]);
-		mRid = (int) jsonData.get("rid");
-		mAppid = (int) jsonData.get("appid");
+		mRid = (int) jsonData.getInt("rid");
+		mAppid = (int) jsonData.getInt("appid");
 		mAuthtype = jsonData.getString("authtype");
 		mSign = jsonData.getString("sign");
 		mTs = jsonData.getString("ts");
@@ -131,8 +131,8 @@ public class ConnectDanMuServer {
 			String danMuAddress = jsonArray.getString(0);
 			mIP = danMuAddress.split(":")[0];
 			mPort = Integer.parseInt(danMuAddress.split(":")[1]);
-			mRid = (int) jsonData.get("rid");
-			mAppid = (int) jsonData.get("appid");
+			mRid = (int) jsonData.getInt("rid");
+			mAppid = (int) jsonData.getInt("appid");
 			mAuthtype = jsonData.getString("authtype");
 			mSign = jsonData.getString("sign");
 			mTs = jsonData.getString("ts");
@@ -228,7 +228,6 @@ public class ConnectDanMuServer {
 	private class HeartBeat implements Runnable{
 		byte[] heartBeatRsponse=new byte[4];
 		int autoConnectedTime=0;
-		@Override
 		public void run() {
 			while(!mIsHeartBeatThreadStop){
 				try {
@@ -274,7 +273,6 @@ public class ConnectDanMuServer {
 	 */
 	private class ReceiveMessage implements Runnable{
 
-		@Override
 		public void run() {
 			byte[] receivMsgFlag=new byte[4];
 			short msgLength;

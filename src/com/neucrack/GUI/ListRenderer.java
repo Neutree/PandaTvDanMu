@@ -59,7 +59,6 @@ public class ListRenderer extends JPanel implements ListCellRenderer<ListItemDan
 		setOpaque(false);
 	}
 	
-	@Override
 	public Component getListCellRendererComponent(
 			JList<? extends ListItemDanMu> list, ListItemDanMu value,
 			int index, boolean isSelected, boolean cellHasFocus) {

@@ -126,8 +126,8 @@ public class PandaTVDanmu extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-					UIManager.setLookAndFeel(lookAndFeel);
+					//String lookAndFeel = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+					//UIManager.setLookAndFeel(lookAndFeel);
 					PandaTVDanmu frame = new PandaTVDanmu();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -237,42 +237,35 @@ public class PandaTVDanmu extends JFrame {
 						this.addWindowListener((WindowListener) this);
 					}
 
-					@Override
 					public void windowOpened(WindowEvent e) {
 						// TODO Auto-generated method stub
 //						System.out.println("1");
 					}
 
-					@Override
 					public void windowClosing(WindowEvent e) {
 						// TODO Auto-generated method stub
 //						System.out.println("2");
 					}
 
-					@Override
 					public void windowClosed(WindowEvent e) {
 //						System.out.println("3");
 					}
 
-					@Override
 					public void windowIconified(WindowEvent e) {
 						// TODO Auto-generated method stub
 //						System.out.println("4");
 					}
 
-					@Override
 					public void windowDeiconified(WindowEvent e) {
 //						System.out.println("5");
 						
 					}
 
-					@Override
 					public void windowActivated(WindowEvent e) {
 //						System.out.println("6");
 						mTransparentValueBefore = mTransparentValue;
 					}
 
-					@Override
 					public void windowDeactivated(WindowEvent e) {
 //						System.out.println("7");
 						parentPanel.setOpacity((float) ((mTransparentValueBefore+100-PreferenceData.MAXTRASPARENTVALUE)/100.0));
@@ -357,7 +350,6 @@ public class PandaTVDanmu extends JFrame {
 				
 				
 				slider.addChangeListener(new ChangeListener() {
-					@Override
 					public void stateChanged(ChangeEvent e) {
 						mTransparentValue = PreferenceData.MAXTRASPARENTVALUE - slider.getValue();
 						transparentLabel.setText("透明度  "+(PreferenceData.MAXTRASPARENTVALUE-mTransparentValue)+"% ");
@@ -659,29 +651,28 @@ public class PandaTVDanmu extends JFrame {
 			}
 		});
 		
-		
-		
-		//全局热键
-		JIntellitype.getInstance().registerHotKey(FUNC_KEY_MARK,0, KeyEvent.VK_F10);
-		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
-			
-			@Override
-			public void onHotKey(int arg0) {
-				switch (arg0) { 
-				case FUNC_KEY_MARK:	
-					if(mLock){
-						UnLock();
-						mLock = false;
+		String osName = System.getProperties().getProperty("os.name");
+		if(osName.startsWith("win")||osName.startsWith("Win")){
+			//全局热键
+			JIntellitype.getInstance().registerHotKey(FUNC_KEY_MARK,0, KeyEvent.VK_F10);
+			JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+				
+				public void onHotKey(int arg0) {
+					switch (arg0) { 
+					case FUNC_KEY_MARK:	
+						if(mLock){
+							UnLock();
+							mLock = false;
+						}
+						else{
+							Lock();
+							mLock=true;
+						}
+						break;
 					}
-					else{
-						Lock();
-						mLock=true;
-					}
-					break;
 				}
-			}
-		});
-		
+			});
+		}
 		mIsEnableVoice = prefData.GetIsEnableVoice();
 		mVoiceName = prefData.GetVoiceName();
 		SpeechUtility.createUtility(SpeechConstant.APPID+"="+PreferenceData.TTS_APPID);
@@ -711,31 +702,26 @@ public class PandaTVDanmu extends JFrame {
 			hint.setFocusable(true);
 			confirmButton.addMouseListener(new MouseListener() {
 				
-				@Override
 				public void mouseReleased(MouseEvent e) {
 					// TODO Auto-generated method stub
 					 
 				}
 				
-				@Override
 				public void mousePressed(MouseEvent e) {
 					// TODO Auto-generated method stub
 					
 				}
 				
-				@Override
 				public void mouseExited(MouseEvent e) {
 					// TODO Auto-generated method stub
 					
 				}
 				
-				@Override
 				public void mouseEntered(MouseEvent e) {
 					// TODO Auto-generated method stub
 					
 				}
 				
-				@Override
 				public void mouseClicked(MouseEvent e) {
 					// TODO Auto-generated method stub
 					java.net.URI uri = java.net.URI.create(latestVersionAddr);
@@ -979,7 +965,6 @@ public class PandaTVDanmu extends JFrame {
 			addMouseListener(this);
 		}
 		
-		@Override
 		public void mouseDragged(MouseEvent e) {
 			if(mLock)
 				return;
@@ -1031,7 +1016,6 @@ public class PandaTVDanmu extends JFrame {
 			frame.setSize(w, h);
 		}
 
-		@Override
 		public void mouseMoved(MouseEvent arg0) {
 			if(mLock)
 				return;
@@ -1081,18 +1065,15 @@ public class PandaTVDanmu extends JFrame {
 			}
 		}
 
-		@Override
 		public void mouseClicked(MouseEvent arg0) {
 		}
 
-		@Override
 		public void mouseEntered(MouseEvent arg0) {
 			if(mLock)
 				return;
 			mIsChangeFrameSize=true;
 		}
 
-		@Override
 		public void mouseExited(MouseEvent arg0) {
 			if(mLock)
 				return;
@@ -1100,11 +1081,9 @@ public class PandaTVDanmu extends JFrame {
 			frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 
-		@Override
 		public void mousePressed(MouseEvent arg0) {
 		}
 
-		@Override
 		public void mouseReleased(MouseEvent arg0) {
 		}
 
