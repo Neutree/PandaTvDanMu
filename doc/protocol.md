@@ -1,9 +1,12 @@
 # 请求弹幕服务器，获取基本值（rid,appid,authtype,ip,port,sign,ts）
+
 使用http协议请求**http://www.panda.tv/ajax_chatinfo**
 参数为**roomid=房间号**
+
 **eg:**
 请求：http://www.panda.tv/ajax_chatinfo?roomid=313180
-响应：{"errno":0,"data":{"rid":27742018,"appid":845694055,"authtype":"3","chat_addr_list":["180.163.220.15:443","180.163.220.15:443"],"sign":"59240676592e351a3be3549aba8579c5","ts":"1456754823867"},"errmsg":""}
+
+响应：`{"errno":0,"data":{"rid":27742018,"appid":845694055,"authtype":"3","chat_addr_list":["180.163.220.15:443","180.163.220.15:443"],"sign":"59240676592e351a3be3549aba8579c5","ts":"1456754823867"},"errmsg":""}`
 
 # 建立连接（socket）：
 ### 前面得到的数据，发送连接请求
