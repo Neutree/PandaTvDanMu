@@ -133,9 +133,9 @@ public class ConnectDanMuServer {
 			mPort = Integer.parseInt(danMuAddress.split(":")[1]);
 			mRid = (int) jsonData.getInt("rid");
 			mAppid = (int) jsonData.getInt("appid");
-			mAuthtype = jsonData.getString("authtype");
+			mAuthtype = jsonData.getString("authType");
 			mSign = jsonData.getString("sign");
-			mTs = jsonData.getString("ts");
+			mTs = String.valueOf(jsonData.getLong("ts"));
 			mErrno = json.getInt("errno");
 			mErrMsg = json.getString("errmsg");
 		}catch(JSONException e){
