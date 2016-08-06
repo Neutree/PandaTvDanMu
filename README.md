@@ -27,6 +27,12 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 # 提示
 软件还在更新中，请关注新版本。如果因为压缩软件等占用了打开方式，不能直接双击打开，请搜索“双击运行jar”
 
+
+# 原理简介
+* 主要通过抓包软件获取到浏览器与PandaTv的弹幕服务器的通信方式和协议，然后进行编写。
+* 主要使用socket进行通信，面向连接的方式来保证弹幕的实时性。开始会使用http来获得弹幕服务器信息以及验证信息，这些信息会在socket通信帧中使用到。
+* 协议见[protocol.md](https://github.com/Neutree/PandaTvDanMu/blob/master/doc/protocol.md)
+
 # 声明
 源码仅供学习交流使用
 
