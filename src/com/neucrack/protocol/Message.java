@@ -53,7 +53,8 @@ public class Message {
 				Visitors visitor=new Visitors();
 				visitor.mTime = time;
 				visitor.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
-				visitor.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				//部分弹幕服务器没有这个。。。所以屏蔽掉
+				//visitor.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
 				visitor.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
 				visitor.mContent = json.getJSONObject("data").getString("content");
 				message = visitor;
@@ -63,7 +64,8 @@ public class Message {
 				gift.mTime = time;
 				gift.mRid = json.getJSONObject("data").getJSONObject("from").getString("rid");
 				gift.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
-				gift.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				//部分弹幕服务器没有这个。。。所以屏蔽掉
+				//gift.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
 				gift.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
 				gift.mContentId = json.getJSONObject("data").getJSONObject("content").getString("id");
 				gift.mContentName = json.getJSONObject("data").getJSONObject("content").getString("name");
