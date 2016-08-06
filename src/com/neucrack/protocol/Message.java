@@ -33,7 +33,7 @@ public class Message {
 				danmu.mNickName = json.getJSONObject("data").getJSONObject("from").getString("nickName");
 				danmu.mLevel = json.getJSONObject("data").getJSONObject("from").getString("level");
 				danmu.mUserName = json.getJSONObject("data").getJSONObject("from").getString("userName");
-				danmu.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
+				//danmu.mQid = json.getJSONObject("data").getJSONObject("to").getInt("toqid");
 				danmu.mRoomID = json.getJSONObject("data").getJSONObject("to").getString("toroom");
 				danmu.mContent = json.getJSONObject("data").getString("content");
 				message = danmu;
