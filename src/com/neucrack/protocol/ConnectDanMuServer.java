@@ -22,7 +22,7 @@ public class ConnectDanMuServer {
 	final static byte[] KEEPALIVE= {0x00,0x06,0x00,0x00};  //与弹幕服务器心跳心跳保持
 	final static byte[] RECEIVEMSG= {0x00,0x06,0x00,0x03}; //接收到消息
 	final static byte[] HEARTBEATRESPONSE ={0x00,0x06,0x00,0x01};//心跳保持服务器返回的值
-	final static String DANMUSERVERURL="http://www.panda.tv/ajax_chatinfo";
+	final static String DANMUSERVERURL="http://riven.panda.tv/chatroom/getinfo";//"http://www.panda.tv/ajax_chatinfo";
 	final static int IGNOREBYTELENGTH = 16;//弹幕消息体忽略的字节数
 	
 	final static int MAX_AUTO_CONNECT_TIME = 5;//自动断线重连次数
