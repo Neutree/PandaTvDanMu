@@ -34,7 +34,7 @@ Panda TV  弹幕助手 （ 熊猫TV 弹幕助手） （JAVA）
 * 协议见[protocol.md](https://github.com/Neutree/PandaTvDanMu/blob/master/doc/protocol.md)
 
 # 声明
-源码仅供学习交流使用
+
 
 
 # 反馈与参与
